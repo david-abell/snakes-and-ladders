@@ -14,6 +14,7 @@ class SnakesAndLadders {
 
   isDoubles = false;
 
+  // eslint-disable-next-line class-methods-use-this
   rollDice() {
     const die1 = getRandomDie();
     const die2 = getRandomDie();
@@ -28,6 +29,7 @@ class SnakesAndLadders {
     return this.turnDice.die1 + this.turnDice.die2;
   }
 
+  // eslint-disable-next-line class-methods-use-this
   move(playerPosition) {
     const bouncedPosition =
       playerPosition > 100 ? 100 - (playerPosition - 100) : playerPosition;
