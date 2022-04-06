@@ -37,3 +37,7 @@ It should have:
 ```bash
 npm run test
 ```
+
+## Credits
+
+- I was inspired to expand on my quick and dirty solution to the CodeWars kata [Snakes and Ladders](https://www.codewars.com/kata/587136ba2eefcb92a9000027/javascript)
