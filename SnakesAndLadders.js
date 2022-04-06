@@ -1,14 +1,18 @@
-const getRandomDie = require("./helpers.js");
+const getRandomDie = require("./helpers");
+const { snakes, ladders } = require("./board");
 
 class SnakesAndLadders {
   player1 = 0;
-  player2 = 0;
-  currentPlayer = 1;
-  turnDice = { die1: null, die2: null };
-  diceTotal = null;
-  isDoubles = false;
 
-  constructor() {}
+  player2 = 0;
+
+  currentPlayer = 1;
+
+  turnDice = { die1: null, die2: null };
+
+  diceTotal = null;
+
+  isDoubles = false;
 
   rollDice() {
     const die1 = getRandomDie();
@@ -87,32 +91,5 @@ class SnakesAndLadders {
     return this.nextPlayerTurn();
   }
 }
-
-const snakes = {
-  16: -10,
-  46: -21,
-  49: -38,
-  62: -43,
-  64: -4,
-  74: -21,
-  89: -21,
-  92: -4,
-  95: -20,
-  99: -19,
-};
-
-const ladders = {
-  2: 36,
-  7: 7,
-  8: 23,
-  15: 11,
-  21: 21,
-  28: 56,
-  36: 8,
-  51: 16,
-  71: 20,
-  78: 20,
-  87: 7,
-};
 
 module.exports = SnakesAndLadders;
