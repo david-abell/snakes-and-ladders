@@ -3,38 +3,12 @@ const getRandomDie = require("./helpers.js");
 class SnakesAndLadders {
   player1 = 0;
   player2 = 0;
-  constructor() {
-    this.currentPlayer = 1;
-  }
+  currentPlayer = 1;
+  turnDice = { die1: null, die2: null };
+  diceTotal = null;
+  isDoubles = false;
 
-  play(die1, die2) {
-    if (this.player1 === 100 || this.player2 === 100) {
-      return "Game over!";
-    }
-    const newRollTotal = this.rollTotal(die1, die2);
-    const doubles = die1 === die2;
-    const newMove =
-      this.currentPlayer === 1
-        ? this.move(this.player1 + newRollTotal)
-        : this.move(this.player2 + newRollTotal);
-    if (this.currentPlayer === 1) {
-      this.player1 = newMove;
-    } else {
-      this.player2 = newMove;
-    }
-    if (newMove === 100) {
-      return `Player ${this.currentPlayer} Wins!`;
-    }
-    if (doubles) {
-      return this.currentPlayer === 1
-        ? `Player 1 is on square ${this.player1}`
-        : `Player 2 is on square ${this.player2}`;
-    }
-    this.currentPlayer = this.currentPlayer === 1 ? 2 : 1;
-    return this.currentPlayer === 1
-      ? `Player 2 is on square ${this.player2}`
-      : `Player 1 is on square ${this.player1}`;
-  }
+  constructor() {}
 
   rollDice() {
     const die1 = getRandomDie();
@@ -42,8 +16,12 @@ class SnakesAndLadders {
     return { die1, die2 };
   }
 
-  rollTotal(die1, die2) {
-    return die1 + die2;
+  checkDoubles() {
+    return this.turnDice.die1 === this.turnDice.die2;
+  }
+
+  rollTotal() {
+    return this.turnDice.die1 + this.turnDice.die2;
   }
 
   move(playerPosition) {
@@ -56,6 +34,57 @@ class SnakesAndLadders {
       return ladders[bouncedPosition] + bouncedPosition;
     }
     return bouncedPosition;
+  }
+
+  samePlayerTurn() {
+    return this.currentPlayer === 1
+      ? `Player 1 is on square ${this.player1}`
+      : `Player 2 is on square ${this.player2}`;
+  }
+
+  nextPlayerTurn() {
+    return this.currentPlayer === 1
+      ? `Player 2 is on square ${this.player2}`
+      : `Player 1 is on square ${this.player1}`;
+  }
+
+  isWon() {
+    if (this.player1 === 100 || this.player2 === 100) {
+      return true;
+    }
+    return false;
+  }
+
+  play() {
+    if (this.isWon()) {
+      return "Game over!";
+    }
+
+    this.turnDice = this.rollDice();
+    this.isDoubles = this.checkDoubles();
+    this.diceTotal = this.rollTotal();
+
+    const newMove =
+      this.currentPlayer === 1
+        ? this.move(this.player1 + this.diceTotal)
+        : this.move(this.player2 + this.diceTotal);
+
+    if (this.currentPlayer === 1) {
+      this.player1 = newMove;
+    } else {
+      this.player2 = newMove;
+    }
+
+    if (newMove === 100) {
+      return `Player ${this.currentPlayer} Wins!`;
+    }
+
+    if (this.isDoubles) {
+      return this.samePlayerTurn();
+    }
+
+    this.currentPlayer = this.currentPlayer === 1 ? 2 : 1;
+    return this.nextPlayerTurn();
   }
 }
 
