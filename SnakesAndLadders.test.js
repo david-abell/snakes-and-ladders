@@ -3,7 +3,7 @@ const SnakesAndLadders = require("./SnakesAndLadders");
 describe("Properties", () => {
   test("Player should get another turn when doubles are rolled", () => {
     const game = new SnakesAndLadders();
-    const spyDice = jest
+    jest
       .spyOn(game, "rollDice")
       .mockReturnValueOnce({ die1: 1, die2: 1 })
       .mockReturnValueOnce({ die1: 1, die2: 1 })
@@ -48,7 +48,7 @@ describe("method roll dice", () => {
 describe("incomplete four dice roll game", () => {
   test("it should create new game board and roll dice four times", () => {
     const game = new SnakesAndLadders();
-    const spyDice = jest
+    jest
       .spyOn(game, "rollDice")
       .mockReturnValueOnce({ die1: 1, die2: 1 })
       .mockReturnValueOnce({ die1: 1, die2: 5 })
@@ -70,9 +70,7 @@ describe("Game ending", () => {
   test("should declare a winner", () => {
     const game = new SnakesAndLadders();
     game.player1 = 98;
-    const spyDice = jest
-      .spyOn(game, "rollDice")
-      .mockReturnValueOnce({ die1: 1, die2: 1 });
+    jest.spyOn(game, "rollDice").mockReturnValueOnce({ die1: 1, die2: 1 });
     const value = game.play();
     expect(value).not.toBe("Player 2 Wins!");
     expect(value).toBe("Player 1 Wins!");
@@ -80,9 +78,7 @@ describe("Game ending", () => {
   test("should declare game over", () => {
     const game = new SnakesAndLadders();
     game.player1 = 98;
-    const spyDice = jest
-      .spyOn(game, "rollDice")
-      .mockReturnValueOnce({ die1: 1, die2: 1 });
+    jest.spyOn(game, "rollDice").mockReturnValueOnce({ die1: 1, die2: 1 });
     game.play();
     game.play();
     const value = game.play();
