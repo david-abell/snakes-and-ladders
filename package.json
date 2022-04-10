@@ -2,7 +2,7 @@
   "name": "snakes-and-ladders",
   "version": "1.0.0",
   "description": "",
-  "main": "game.js",
+  "default": "game.js",
   "scripts": {
     "test": "jest"
   },
