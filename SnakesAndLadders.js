@@ -1,5 +1,7 @@
-const getRandomDie = require("./helpers");
-const { snakes, ladders } = require("./board");
+"use-strict";
+
+import getRandomDie from "./helpers.js";
+import { snakes, ladders, drawGrid, initBoard } from "./board.js";
 
 class SnakesAndLadders {
   player1 = 0;
@@ -13,6 +15,10 @@ class SnakesAndLadders {
   diceTotal = null;
 
   isDoubles = false;
+
+  constructor(boardSize) {
+    this.boardSize = boardSize;
+  }
 
   // eslint-disable-next-line class-methods-use-this
   rollDice() {
@@ -92,6 +98,10 @@ class SnakesAndLadders {
     this.currentPlayer = this.currentPlayer === 1 ? 2 : 1;
     return this.nextPlayerTurn();
   }
+
+  init() {
+    initBoard(this.boardSize);
+  }
 }
 
-module.exports = SnakesAndLadders;
+export default SnakesAndLadders;
