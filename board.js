@@ -68,11 +68,20 @@ function drawGrid(boardElement) {
   }
 }
 
-function initBoard(boardSize) {
+function initBoard(inputSize) {
+  const isInputInteger = Number.isInteger(inputSize);
+  const requestedSize = isInputInteger ? Math.max(inputSize, 250) : 800;
+  const maxBoardSize = Math.min(window.innerHeight, window.innerWidth);
+  const boardSize = requestedSize < maxBoardSize ? requestedSize : maxBoardSize;
+  if (!document.querySelector("#game")) {
+    const canvas = document.createElement("canvas");
+    canvas.setAttribute("id", "game");
+    document.body.append(canvas);
+  }
   game = document.querySelector("#game");
   game.width = boardSize;
   game.height = boardSize;
   context = game.getContext("2d");
   drawGrid(game);
 }
-export { snakes, ladders, drawGrid, initBoard };
+export { snakes, ladders, drawGrid, initBoard, game };

@@ -16,7 +16,7 @@ class SnakesAndLadders {
 
   isDoubles = false;
 
-  constructor(boardSize) {
+  constructor(boardSize = 800) {
     this.boardSize = boardSize;
   }
 
