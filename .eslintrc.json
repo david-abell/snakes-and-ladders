@@ -16,7 +16,13 @@
     "jest/no-identical-title": "error",
     "jest/prefer-to-have-length": "warn",
     "jest/valid-expect": "error",
-    "import/extensions": [".js"]
+    "import/extensions": [
+      "error",
+      "ignorePackages",
+      {
+        "js": "always"
+      }
+    ]
   },
   "plugins": ["prettier", "jest"]
 }
