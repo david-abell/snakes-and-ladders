@@ -1,4 +1,4 @@
-const SnakesAndLadders = require("./SnakesAndLadders");
+import SnakesAndLadders from "./SnakesAndLadders.js";
 
 describe("Properties", () => {
   test("Player should get another turn when doubles are rolled", () => {
