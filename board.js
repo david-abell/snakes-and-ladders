@@ -30,9 +30,9 @@ const ladders = {
 let game;
 let context;
 
-function drawGrid(board) {
-  const { width } = board;
-  const { height } = board;
+function drawGrid(boardElement) {
+  const { width } = boardElement;
+  const { height } = boardElement;
   const gridCount = width / 10;
 
   context.beginPath();
