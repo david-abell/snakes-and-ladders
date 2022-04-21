@@ -70,7 +70,7 @@ function drawGrid(boardElement) {
 
 function initBoard(inputSize) {
   const isInputInteger = Number.isInteger(inputSize);
-  const requestedSize = isInputInteger ? Math.max(inputSize, 250) : 800;
+  const requestedSize = isInputInteger ? Math.max(inputSize, 250) : 250;
   const maxBoardSize = Math.min(window.innerHeight, window.innerWidth);
   const boardSize = requestedSize < maxBoardSize ? requestedSize : maxBoardSize;
   if (!document.querySelector("#game")) {

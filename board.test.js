@@ -3,18 +3,37 @@
  */
 import { drawGrid, initBoard, game } from "./board.js";
 
-global.innerHeight = 1000;
-global.innerWidth = 1760;
+global.innerHeight = 980;
+global.innerWidth = 1740;
+
 describe("drawGrid", () => {
   test("", () => {});
 });
 
-describe("initBoard", () => {
+describe("initBoard size setup", () => {
   beforeEach(() => jest.resetModules());
-  test("", () => {});
-  test("boardsize should default to 800px", () => {
+  test("boardsize should default to 250px", () => {
     initBoard();
-    expect(game.height).toBe(800);
+    expect(game.height).toBe(250);
   });
-  test("board should expect random input sizes", () => {});
+  test("too large", () => {
+    initBoard(2000);
+    expect(game.height).toBe(980);
+  });
+  test("too small", () => {
+    initBoard(20);
+    expect(game.height).toBe(250);
+  });
+  test("decimal", () => {
+    initBoard(0.8);
+    expect(game.height).toBe(250);
+  });
+  test("400px", () => {
+    initBoard("400px");
+    expect(game.height).toBe(250);
+  });
+  test("0", () => {
+    initBoard(0);
+    expect(game.height).toBe(250);
+  });
 });
