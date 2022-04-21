@@ -3,6 +3,7 @@
 import getRandomDie from "./helpers.js";
 import { snakes, ladders, initBoard, game, context } from "./board.js";
 import PlayerToken from "./PlayerToken.js";
+import initTokens from "./TokenBoard.js";
 
 // Update players to object?
 class SnakesAndLadders {
@@ -84,11 +85,11 @@ class SnakesAndLadders {
     const { position } = this.players[player];
     const isEvenRow = Math.floor(position / 10) % 2 === 0;
     const yOffset = Math.floor(position / 10) * gridCount;
-    let coordinateX = gridCount / 2 + gridCount * position - yOffset * 10;
+    let coordinateX = gridCount / 2 + gridCount * (position - 1) - yOffset * 10;
 
     if (!isEvenRow) {
       coordinateX =
-        width - (gridCount / 2 + gridCount * position - yOffset * 10);
+        width - (gridCount / 2 + gridCount * (position - 1) - yOffset * 10);
     }
 
     const coordinateY = height - (gridCount / 2 + yOffset);
@@ -149,6 +150,8 @@ class SnakesAndLadders {
 
     this.players[this.currentPlayer].position = newMove;
     this.movePlayerToken();
+    console.log(this.players[this.currentPlayer]);
+
     if (newMove === 100) {
       return `Player ${this.currentPlayer} Wins!`;
     }
@@ -162,6 +165,7 @@ class SnakesAndLadders {
 
   init() {
     initBoard(this.boardSize);
+    initTokens(this.boardSize);
   }
 }
 

@@ -2,7 +2,10 @@
 
 // Inputs: player number
 // Variables: player color, player position
+
 class PlayerToken {
+  token = new Path2D();
+
   constructor(playerNumber) {
     this.playerNumber = playerNumber;
     this.playerColor = this.setPlayerColor();

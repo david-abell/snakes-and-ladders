@@ -80,11 +80,13 @@ body {
   place-items: center;
 }
 
-#game {
-  /* width: 504px;
-  height: 504px; */
+#game-board {
   border: 2px solid lightgray;
-  /* margin: 0 auto; */
   display: block;
   background-color: rgb(230, 230, 230);
+  position: relative;
+}
+
+#token-board {
+  position: absolute;
 }
