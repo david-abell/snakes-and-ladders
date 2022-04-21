@@ -27,10 +27,12 @@ const ladders = {
   87: 7,
 };
 
+// eslint-disable-next-line import/no-mutable-exports
 let game;
+// eslint-disable-next-line import/no-mutable-exports
 let context;
 
-function drawGrid(boardElement) {
+function drawBoard(boardElement) {
   const { width } = boardElement;
   const { height } = boardElement;
   const gridCount = width / 10;
@@ -82,6 +84,6 @@ function initBoard(inputSize) {
   game.width = boardSize;
   game.height = boardSize;
   context = game.getContext("2d");
-  drawGrid(game);
+  drawBoard(game);
 }
-export { snakes, ladders, drawGrid, initBoard, game };
+export { snakes, ladders, drawBoard, initBoard, game, context };

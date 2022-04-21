@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-import { drawGrid, initBoard, game } from "./board.js";
+import { initBoard, game } from "./board.js";
 
 global.innerHeight = 980;
 global.innerWidth = 1740;
