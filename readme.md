@@ -2,7 +2,11 @@
 
 ## How to play
 
-currently under development
+[Play the live version here!](https://david-abell.github.io/snakes-and-ladders/)
+
+Just click the Play button below the game board!
+
+currently under development.
 
 ## Project goals
 
