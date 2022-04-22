@@ -82,6 +82,7 @@ class SnakesAndLadders {
     return false;
   }
 
+  // this has errors, goes negative at win condition
   calcCoordinates(player) {
     const { width } = game;
     const { height } = game;
@@ -152,6 +153,7 @@ class SnakesAndLadders {
 
     if (this.isDoubles) {
       this.samePlayerTurn();
+      return;
     }
     this.setCurrentPlayer();
     this.nextPlayerTurn();
