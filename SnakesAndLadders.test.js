@@ -12,13 +12,18 @@ describe("Properties", () => {
       .mockReturnValueOnce({ die1: 2, die2: 3 });
 
     game.play();
+    expect(game.isDoubles).toBe(true);
     game.play();
+    expect(game.isDoubles).toBe(true);
     expect(game.currentPlayer).toBe(1);
     game.play();
+    expect(game.isDoubles).toBe(false);
     expect(game.currentPlayer).toBe(2);
     game.play();
+    expect(game.isDoubles).toBe(true);
     expect(game.currentPlayer).toBe(2);
     game.play();
+    expect(game.isDoubles).toBe(false);
     expect(game.currentPlayer).toBe(1);
   });
 });
@@ -55,35 +60,34 @@ describe("incomplete four dice roll game", () => {
       .mockReturnValueOnce({ die1: 6, die2: 2 })
       .mockReturnValueOnce({ die1: 1, die2: 1 });
 
-    let value = game.play();
-    expect(value).toBe("Player 1 is on square 38");
-    value = game.play();
-    expect(value).toBe("Player 1 is on square 44");
-    value = game.play();
-    expect(value).toBe("Player 2 is on square 31");
-    value = game.play();
-    expect(value).toBe("Player 1 is on square 25");
+    game.play();
+    expect(game.message).toBe("Player 1 is on square 38");
+    game.play();
+    expect(game.message).toBe("Player 1 is on square 44");
+    game.play();
+    expect(game.message).toBe("Player 2 is on square 31");
+    game.play();
+    expect(game.message).toBe("Player 1 is on square 25");
   });
 });
 
 describe("Game ending", () => {
   test("should declare a winner", () => {
     const game = new SnakesAndLadders();
-    game.player1 = 98;
+    game.players[1].position = 98;
     jest.spyOn(game, "rollDice").mockReturnValueOnce({ die1: 1, die2: 1 });
-    const value = game.play();
-    expect(value).not.toBe("Player 2 Wins!");
-    expect(value).toBe("Player 1 Wins!");
+    game.play();
+    expect(game.message).not.toBe("Player 2 Wins!");
+    expect(game.message).toBe("Player 1 Wins!");
   });
   test("should declare game over", () => {
     const game = new SnakesAndLadders();
-    game.player1 = 98;
+    game.players[1].position = 98;
     jest.spyOn(game, "rollDice").mockReturnValueOnce({ die1: 1, die2: 1 });
     game.play();
     game.play();
-    const value = game.play();
-    expect(value).not.toBe("Player 1 Wins!");
-    expect(value).not.toBe("Player 2 Wins!");
-    expect(value).toBe("Game over!");
+    expect(game.message).not.toBe("Player 1 Wins!");
+    expect(game.message).not.toBe("Game over! Player 2 has won!");
+    expect(game.message).toBe("Game over! Player 1 has won!");
   });
 });
