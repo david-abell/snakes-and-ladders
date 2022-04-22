@@ -27,10 +27,13 @@ const ladders = {
   87: 7,
 };
 
-// eslint-disable-next-line import/no-mutable-exports
-let game;
-// eslint-disable-next-line import/no-mutable-exports
-let context;
+if (!document.querySelector("#game-board")) {
+  const canvas = document.createElement("canvas");
+  canvas.setAttribute("id", "game-board");
+  document.body.append(canvas);
+}
+const game = document.querySelector("#game-board");
+const context = game.getContext("2d");
 
 function drawBoard(boardElement) {
   const { width } = boardElement;
@@ -75,15 +78,9 @@ function initBoard(inputSize) {
   const requestedSize = isInputInteger ? Math.max(inputSize, 250) : 250;
   const maxBoardSize = Math.min(window.innerHeight, window.innerWidth);
   const boardSize = requestedSize < maxBoardSize ? requestedSize : maxBoardSize;
-  if (!document.querySelector("#game-board")) {
-    const canvas = document.createElement("canvas");
-    canvas.setAttribute("id", "game-board");
-    document.body.append(canvas);
-  }
-  game = document.querySelector("#game-board");
+
   game.width = boardSize;
   game.height = boardSize;
-  context = game.getContext("2d");
   drawBoard(game);
 }
 export { snakes, ladders, drawBoard, initBoard, game, context };
