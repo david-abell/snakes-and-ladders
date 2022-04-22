@@ -9,10 +9,6 @@ import initTokens from "./TokenBoard.js";
 class SnakesAndLadders {
   victory = false;
 
-  player1 = 0;
-
-  player2 = 0;
-
   currentPlayer = 1;
 
   players = {
@@ -149,6 +145,7 @@ class SnakesAndLadders {
 
     if (this.victory) {
       this.message = `Player ${this.currentPlayer} Wins!`;
+      return;
     }
 
     if (this.isDoubles) {
