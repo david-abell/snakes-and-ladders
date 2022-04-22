@@ -1,6 +1,3 @@
-/**
- * @jest-environment jsdom
- */
 import { initBoard, game } from "./board.js";
 
 global.innerHeight = 980;
