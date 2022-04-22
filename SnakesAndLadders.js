@@ -9,10 +9,6 @@ import initTokens from "./TokenBoard.js";
 class SnakesAndLadders {
   victory = false;
 
-  player1 = 0;
-
-  player2 = 0;
-
   currentPlayer = 1;
 
   players = {
@@ -35,6 +31,8 @@ class SnakesAndLadders {
   diceTotal = null;
 
   isDoubles = false;
+
+  message = "";
 
   constructor(boardSize = 800) {
     this.boardSize = boardSize;
@@ -60,15 +58,17 @@ class SnakesAndLadders {
   }
 
   samePlayerTurn() {
-    return this.currentPlayer === 1
-      ? `Player 1 is on square ${this.players[1].position}`
-      : `Player 2 is on square ${this.players[2].position}`;
+    this.message =
+      this.currentPlayer === 1
+        ? `Player 1 is on square ${this.players[1].position}`
+        : `Player 2 is on square ${this.players[2].position}`;
   }
 
   nextPlayerTurn() {
-    return this.currentPlayer === 1
-      ? `Player 2 is on square ${this.players[2].position}`
-      : `Player 1 is on square ${this.players[1].position}`;
+    this.message =
+      this.currentPlayer === 1
+        ? `Player 2 is on square ${this.players[2].position}`
+        : `Player 1 is on square ${this.players[1].position}`;
   }
 
   isWon() {
@@ -78,23 +78,24 @@ class SnakesAndLadders {
     return false;
   }
 
+  // This was a pain in the but getting the calculations right
   calcCoordinates(player) {
     const { width } = game;
     const { height } = game;
     const gridCount = width / 10;
-    const { position } = this.players[player];
-    const isEvenRow = Math.floor(position / 10) % 2 === 0;
+    const centerOffset = gridCount / 2;
+    // @Position minus 1 because the row calculations only work 0-9, not 1-10
+    const position = this.players[player].position - 1;
+    const isEvenRow = Math.floor(position / 10) % 2 !== 0;
     const yOffset = Math.floor(position / 10) * gridCount;
-    let coordinateX = gridCount / 2 + gridCount * (position - 1) - yOffset * 10;
+    const xOffset = (position - Math.floor(position / 10) * 10) * gridCount;
+    let coordinateX = centerOffset + xOffset;
 
-    if (!isEvenRow) {
-      coordinateX =
-        width - (gridCount / 2 + gridCount * (position - 1) - yOffset * 10);
+    if (isEvenRow) {
+      coordinateX = width - (centerOffset + xOffset);
     }
 
     const coordinateY = height - (gridCount / 2 + yOffset);
-
-    // context.fillText(`${position + 1}`, coorY, coorY);
 
     return { coordinateX, coordinateY };
   }
@@ -126,11 +127,9 @@ class SnakesAndLadders {
   }
 
   play() {
-    this.victory = this.isWon();
-    console.log(this.victory);
-
     if (this.victory) {
-      return "Game over!";
+      this.message = `Game over! Player ${this.currentPlayer} has won!`;
+      return;
     }
 
     this.turnDice = this.rollDice();
@@ -142,25 +141,21 @@ class SnakesAndLadders {
         ? this.move(this.players[1].position + this.diceTotal)
         : this.move(this.players[2].position + this.diceTotal);
 
-    // if (this.currentPlayer === 1) {
-    //   this.player1 = newMove;
-    // } else {
-    //   this.player2 = newMove;
-    // }
-
     this.players[this.currentPlayer].position = newMove;
     this.movePlayerToken();
-    console.log(this.players[this.currentPlayer]);
+    this.victory = this.isWon();
 
-    if (newMove === 100) {
-      return `Player ${this.currentPlayer} Wins!`;
+    if (this.victory) {
+      this.message = `Player ${this.currentPlayer} Wins!`;
+      return;
     }
 
     if (this.isDoubles) {
-      return this.samePlayerTurn();
+      this.samePlayerTurn();
+      return;
     }
     this.setCurrentPlayer();
-    return this.nextPlayerTurn();
+    this.nextPlayerTurn();
   }
 
   init() {

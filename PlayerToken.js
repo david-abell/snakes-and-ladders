@@ -22,6 +22,9 @@ class PlayerToken {
   }
 
   draw(x, y, context) {
+    context.clearRect(x, y, 15, 15);
+    context.beginPath();
+
     const circle = new Path2D();
     circle.arc(x, y, 15, 0, 2 * Math.PI);
     context.fillStyle = this.playerColor;
