@@ -78,19 +78,21 @@ class SnakesAndLadders {
     return false;
   }
 
-  // this has errors, goes negative at win condition
+  // This was a pain in the but getting the calculations right
   calcCoordinates(player) {
     const { width } = game;
     const { height } = game;
     const gridCount = width / 10;
-    const { position } = this.players[player];
-    const isEvenRow = Math.floor(position / 10) % 2 === 0;
+    const centerOffset = gridCount / 2;
+    // @Position minus 1 because the row calculations only work 0-9, not 1-10
+    const position = this.players[player].position - 1;
+    const isEvenRow = Math.floor(position / 10) % 2 !== 0;
     const yOffset = Math.floor(position / 10) * gridCount;
-    let coordinateX = gridCount / 2 + gridCount * (position - 1) - yOffset * 10;
+    const xOffset = (position - Math.floor(position / 10) * 10) * gridCount;
+    let coordinateX = centerOffset + xOffset;
 
-    if (!isEvenRow) {
-      coordinateX =
-        width - (gridCount / 2 + gridCount * (position - 1) - yOffset * 10);
+    if (isEvenRow) {
+      coordinateX = width - (centerOffset + xOffset);
     }
 
     const coordinateY = height - (gridCount / 2 + yOffset);
