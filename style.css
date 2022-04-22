@@ -76,8 +76,10 @@ select {
 
 body {
   height: 100%;
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 #game-board {
@@ -89,4 +91,8 @@ body {
 
 #token-board {
   position: absolute;
+}
+
+#message {
+  padding-block: 1em;
 }

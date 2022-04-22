@@ -36,6 +36,8 @@ class SnakesAndLadders {
 
   isDoubles = false;
 
+  message = "";
+
   constructor(boardSize = 800) {
     this.boardSize = boardSize;
   }
@@ -60,15 +62,17 @@ class SnakesAndLadders {
   }
 
   samePlayerTurn() {
-    return this.currentPlayer === 1
-      ? `Player 1 is on square ${this.players[1].position}`
-      : `Player 2 is on square ${this.players[2].position}`;
+    this.message =
+      this.currentPlayer === 1
+        ? `Player 1 is on square ${this.players[1].position}`
+        : `Player 2 is on square ${this.players[2].position}`;
   }
 
   nextPlayerTurn() {
-    return this.currentPlayer === 1
-      ? `Player 2 is on square ${this.players[2].position}`
-      : `Player 1 is on square ${this.players[1].position}`;
+    this.message =
+      this.currentPlayer === 1
+        ? `Player 2 is on square ${this.players[2].position}`
+        : `Player 1 is on square ${this.players[1].position}`;
   }
 
   isWon() {
@@ -93,8 +97,6 @@ class SnakesAndLadders {
     }
 
     const coordinateY = height - (gridCount / 2 + yOffset);
-
-    // context.fillText(`${position + 1}`, coorY, coorY);
 
     return { coordinateX, coordinateY };
   }
@@ -126,11 +128,9 @@ class SnakesAndLadders {
   }
 
   play() {
-    this.victory = this.isWon();
-    console.log(this.victory);
-
     if (this.victory) {
-      return "Game over!";
+      this.message = `Game over! Player ${this.currentPlayer} has won!`;
+      return;
     }
 
     this.turnDice = this.rollDice();
@@ -142,25 +142,19 @@ class SnakesAndLadders {
         ? this.move(this.players[1].position + this.diceTotal)
         : this.move(this.players[2].position + this.diceTotal);
 
-    // if (this.currentPlayer === 1) {
-    //   this.player1 = newMove;
-    // } else {
-    //   this.player2 = newMove;
-    // }
-
     this.players[this.currentPlayer].position = newMove;
     this.movePlayerToken();
-    console.log(this.players[this.currentPlayer]);
+    this.victory = this.isWon();
 
-    if (newMove === 100) {
-      return `Player ${this.currentPlayer} Wins!`;
+    if (this.victory) {
+      this.message = `Player ${this.currentPlayer} Wins!`;
     }
 
     if (this.isDoubles) {
-      return this.samePlayerTurn();
+      this.samePlayerTurn();
     }
     this.setCurrentPlayer();
-    return this.nextPlayerTurn();
+    this.nextPlayerTurn();
   }
 
   init() {
