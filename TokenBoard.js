@@ -8,7 +8,7 @@ if (!document.querySelector("#game-tokens")) {
 
 const tokenBoard = document.querySelector("#game-tokens");
 // eslint-disable-next-line no-unused-vars
-const context = tokenBoard.getContext("2d");
+const tokenContext = tokenBoard.getContext("2d");
 
 function initTokens(inputSize) {
   const isInputInteger = Number.isInteger(inputSize);
@@ -20,4 +20,4 @@ function initTokens(inputSize) {
   tokenBoard.height = boardSize;
 }
 
-export default initTokens;
+export { initTokens, tokenContext };

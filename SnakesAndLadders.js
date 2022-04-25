@@ -1,9 +1,9 @@
 "use-strict";
 
 import getRandomDie from "./helpers.js";
-import { snakes, ladders, initBoard, game, context } from "./board.js";
+import { snakes, ladders, initBoard, game } from "./board.js";
 import PlayerToken from "./PlayerToken.js";
-import initTokens from "./TokenBoard.js";
+import { initTokens, tokenContext } from "./TokenBoard.js";
 
 // Update players to object?
 class SnakesAndLadders {
@@ -16,13 +16,13 @@ class SnakesAndLadders {
       position: 0,
       coordinateX: 0,
       coordinateY: 0,
-      token: new PlayerToken(1),
+      token: new PlayerToken(1, tokenContext),
     },
     2: {
       position: 0,
       coordinateX: 0,
       coordinateY: 0,
-      token: new PlayerToken(2),
+      token: new PlayerToken(2, tokenContext),
     },
   };
 
@@ -123,7 +123,13 @@ class SnakesAndLadders {
     this.setPlayerCoordinates(this.currentPlayer, tokenPosition);
     const drawX = this.players[this.currentPlayer].coordinateX;
     const drawY = this.players[this.currentPlayer].coordinateY;
-    this.players[this.currentPlayer].token.draw(drawX, drawY, context);
+    this.players[this.currentPlayer].token.draw(drawX, drawY);
+  }
+
+  clearPlayerToken() {
+    const clearX = this.players[this.currentPlayer].coordinateX;
+    const clearY = this.players[this.currentPlayer].coordinateY;
+    this.players[this.currentPlayer].token.clear(clearX, clearY);
   }
 
   play() {
@@ -141,6 +147,7 @@ class SnakesAndLadders {
         ? this.move(this.players[1].position + this.diceTotal)
         : this.move(this.players[2].position + this.diceTotal);
 
+    this.clearPlayerToken();
     this.players[this.currentPlayer].position = newMove;
     this.movePlayerToken();
     this.victory = this.isWon();
