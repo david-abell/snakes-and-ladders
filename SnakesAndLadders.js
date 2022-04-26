@@ -120,18 +120,17 @@ class SnakesAndLadders {
     const bouncedPosition =
       playerPosition > 100 ? 100 - (playerPosition - 100) : playerPosition;
 
-    switch (bouncedPosition) {
-      case snakes[bouncedPosition]:
-        this.players[this.currentPlayer].position =
-          snakes[bouncedPosition] + bouncedPosition;
-        break;
-      case ladders[bouncedPosition]:
-        this.players[this.currentPlayer].position =
-          ladders[bouncedPosition] + bouncedPosition;
-        break;
-      default:
-        this.players[this.currentPlayer].position = bouncedPosition;
+    if (snakes[bouncedPosition]) {
+      this.players[this.currentPlayer].position =
+        snakes[bouncedPosition] + bouncedPosition;
+      return;
     }
+    if (ladders[bouncedPosition]) {
+      this.players[this.currentPlayer].position =
+        ladders[bouncedPosition] + bouncedPosition;
+      return;
+    }
+    this.players[this.currentPlayer].position = bouncedPosition;
   }
 
   getPlayerCoordinates(player) {
