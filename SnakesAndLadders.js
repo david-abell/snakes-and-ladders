@@ -1,6 +1,6 @@
 "use-strict";
 
-import getRandomDie from "./helpers.js";
+import { getRandomDie } from "./helpers.js";
 import { snakes, ladders, initBoard } from "./board.js";
 import PlayerToken from "./PlayerToken.js";
 import { initTokens, tokenContext } from "./TokenBoard.js";
@@ -13,14 +13,10 @@ class SnakesAndLadders {
   players = {
     1: {
       position: 0,
-      coordinateX: 0,
-      coordinateY: 0,
       token: new PlayerToken(1, tokenContext),
     },
     2: {
       position: 0,
-      coordinateX: 0,
-      coordinateY: 0,
       token: new PlayerToken(2, tokenContext),
     },
   };
@@ -120,17 +116,29 @@ class SnakesAndLadders {
     const bouncedPosition =
       playerPosition > 100 ? 100 - (playerPosition - 100) : playerPosition;
 
-    if (snakes[bouncedPosition]) {
-      this.players[this.currentPlayer].position =
-        snakes[bouncedPosition] + bouncedPosition;
-      return;
-    }
-    if (ladders[bouncedPosition]) {
-      this.players[this.currentPlayer].position =
-        ladders[bouncedPosition] + bouncedPosition;
-      return;
-    }
     this.players[this.currentPlayer].position = bouncedPosition;
+  }
+
+  checkPortal() {
+    // console.log("checking portal:", this.players[this.currentPlayer].position);
+    if (snakes[this.players[this.currentPlayer].position]) {
+      this.players[this.currentPlayer].position +=
+        snakes[this.players[this.currentPlayer].position];
+      this.players[this.currentPlayer].token.animate(
+        this.players[this.currentPlayer].position,
+        true
+      );
+      // console.log("portal found:", this.players[this.currentPlayer].position);
+    }
+    if (ladders[this.players[this.currentPlayer].position]) {
+      this.players[this.currentPlayer].position +=
+        ladders[this.players[this.currentPlayer].position];
+      this.players[this.currentPlayer].token.animate(
+        this.players[this.currentPlayer].position,
+        true
+      );
+      // console.log("portal found:", this.players[this.currentPlayer].position);
+    }
   }
 
   getPlayerCoordinates(player) {
@@ -148,16 +156,33 @@ class SnakesAndLadders {
 
   movePlayerToken() {
     const player = this.players[this.currentPlayer];
-    let drawX = this.getPlayerCoordinates(player)[0];
-    let drawY = this.getPlayerCoordinates(player)[1];
-    this.players[this.currentPlayer].token.draw(drawX, drawY);
-
-    this.players[this.currentPlayer].token.setNewXY(drawX, drawY);
-    // this.players[this.currentPlayer].token.animationLoop();
+    const secondPlayer = this.currentPlayer === 1 ? 2 : 1;
+    // let drawX = this.getPlayerCoordinates(player)[0];
+    // let drawY = this.getPlayerCoordinates(player)[1];
+    this.players[this.currentPlayer].token.animate(
+      player.position,
+      false,
+      () => {
+        this.redrawPlayerTokens();
+      }
+    );
+    // this.players[this.currentPlayer].token.draw(drawX, drawY);
+    // this.players[this.currentPlayer].token.setNewXY(drawX, drawY);
 
     // Redraw second player
-    const secondPlayer = this.currentPlayer === 1 ? 2 : 1;
+    // eslint-disable-next-line prefer-destructuring
+    const drawX = this.getPlayerCoordinates(this.players[secondPlayer])[0];
+    // eslint-disable-next-line prefer-destructuring
+    const drawY = this.getPlayerCoordinates(this.players[secondPlayer])[1];
+    this.players[secondPlayer].token.draw(drawX, drawY);
+    // console.log(player, this.players[secondPlayer]);
+  }
 
+  redrawPlayerTokens() {
+    const secondPlayer = this.currentPlayer === 1 ? 2 : 1;
+    let drawX = this.getPlayerCoordinates(this.players[this.currentPlayer])[0];
+    let drawY = this.getPlayerCoordinates(this.players[this.currentPlayer])[1];
+    this.players[this.currentPlayer].token.draw(drawX, drawY);
     // eslint-disable-next-line prefer-destructuring
     drawX = this.getPlayerCoordinates(this.players[secondPlayer])[0];
     // eslint-disable-next-line prefer-destructuring
@@ -177,6 +202,7 @@ class SnakesAndLadders {
     this.clearPlayerToken();
     this.setPlayerPosition();
     this.movePlayerToken();
+    this.checkPortal();
     this.victory = this.isWon();
 
     if (this.victory) {
@@ -194,7 +220,10 @@ class SnakesAndLadders {
 
   init() {
     this.gridReference = initBoard(this.boardSize);
+    this.players[1].token.setGrid(this.gridReference);
+    this.players[2].token.setGrid(this.gridReference);
     initTokens(this.boardSize);
+    this.redrawPlayerTokens();
   }
 }
 
