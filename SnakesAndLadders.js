@@ -34,6 +34,8 @@ class SnakesAndLadders {
 
   message = "";
 
+  gridReferenc;
+
   constructor(boardSize = 800) {
     this.boardSize = boardSize;
   }
@@ -78,7 +80,7 @@ class SnakesAndLadders {
     return false;
   }
 
-  // This was a pain in the but getting the calculations right
+  // This was a pain in the butt getting the calculations right
   calcCoordinates(player) {
     const { width } = game;
     const { height } = game;
@@ -100,9 +102,15 @@ class SnakesAndLadders {
     return { coordinateX, coordinateY };
   }
 
-  setPlayerCoordinates(player, coordinateObject) {
-    this.players[player].coordinateX = coordinateObject.coordinateX;
-    this.players[player].coordinateY = coordinateObject.coordinateY;
+  setPlayerCoordinates(player, coordinates) {
+    this.players[player].coordinateX = coordinates.coordinateX;
+    // this.players[player].token.newTokenX = coordinates.coordinateX;
+    this.players[player].coordinateY = coordinates.coordinateY;
+    // this.players[player].token.newTokenY = coordinates.coordinateY;
+    this.players[player].token.setNewXY(
+      coordinates.coordinateX,
+      coordinates.coordinateY
+    );
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -121,9 +129,10 @@ class SnakesAndLadders {
   movePlayerToken() {
     const tokenPosition = this.calcCoordinates(this.currentPlayer);
     this.setPlayerCoordinates(this.currentPlayer, tokenPosition);
-    const drawX = this.players[this.currentPlayer].coordinateX;
-    const drawY = this.players[this.currentPlayer].coordinateY;
-    this.players[this.currentPlayer].token.draw(drawX, drawY);
+    // const drawX = this.players[this.currentPlayer].coordinateX;
+    // const drawY = this.players[this.currentPlayer].coordinateY;
+    // this.players[this.currentPlayer].token.draw(drawX, drawY);
+    this.players[this.currentPlayer].token.animationLoop();
   }
 
   clearPlayerToken() {
@@ -147,7 +156,7 @@ class SnakesAndLadders {
         ? this.move(this.players[1].position + this.diceTotal)
         : this.move(this.players[2].position + this.diceTotal);
 
-    this.clearPlayerToken();
+    // this.clearPlayerToken();
     this.players[this.currentPlayer].position = newMove;
     this.movePlayerToken();
     this.victory = this.isWon();
@@ -166,7 +175,7 @@ class SnakesAndLadders {
   }
 
   init() {
-    initBoard(this.boardSize);
+    this.gridReference = initBoard(this.boardSize);
     initTokens(this.boardSize);
   }
 }

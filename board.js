@@ -44,6 +44,7 @@ function drawBoard(boardElement) {
   context.strokeStyle = "black";
   context.lineWidth = 1;
 
+  // Draw grid lines
   for (let x = 0; x <= width; x += gridCount) {
     context.moveTo(x, 0);
     context.lineTo(x, height);
@@ -53,6 +54,9 @@ function drawBoard(boardElement) {
     context.moveTo(0, y);
     context.lineTo(width, y);
   }
+
+  // Create grid reference and Draw grid numbers
+  const result = [];
   context.stroke();
 
   context.font = "30px Arial";
@@ -70,7 +74,9 @@ function drawBoard(boardElement) {
     const squareYStart = height - (gridCount / 2 + yOffset);
 
     context.fillText(`${i + 1}`, squareXStart, squareYStart);
+    result.push([squareXStart, squareYStart]);
   }
+  return result;
 }
 
 function initBoard(inputSize) {
@@ -81,6 +87,7 @@ function initBoard(inputSize) {
 
   game.width = boardSize;
   game.height = boardSize;
-  drawBoard(game);
+  const gridReference = drawBoard(game);
+  return gridReference;
 }
 export { snakes, ladders, drawBoard, initBoard, game, context };
