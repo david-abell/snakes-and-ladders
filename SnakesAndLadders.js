@@ -1,11 +1,10 @@
 "use-strict";
 
 import getRandomDie from "./helpers.js";
-import { snakes, ladders, initBoard, game } from "./board.js";
+import { snakes, ladders, initBoard } from "./board.js";
 import PlayerToken from "./PlayerToken.js";
 import { initTokens, tokenContext } from "./TokenBoard.js";
 
-// Update players to object?
 class SnakesAndLadders {
   victory = false;
 
@@ -34,7 +33,7 @@ class SnakesAndLadders {
 
   message = "";
 
-  gridReferenc;
+  gridReference;
 
   constructor(boardSize = 800) {
     this.boardSize = boardSize;
@@ -80,65 +79,91 @@ class SnakesAndLadders {
     return false;
   }
 
-  // This was a pain in the butt getting the calculations right
-  calcCoordinates(player) {
-    const { width } = game;
-    const { height } = game;
-    const gridCount = width / 10;
-    const centerOffset = gridCount / 2;
-    // @Position minus 1 because the row calculations only work 0-9, not 1-10
-    const position = this.players[player].position - 1;
-    const isEvenRow = Math.floor(position / 10) % 2 !== 0;
-    const yOffset = Math.floor(position / 10) * gridCount;
-    const xOffset = (position - Math.floor(position / 10) * 10) * gridCount;
-    let coordinateX = centerOffset + xOffset;
+  // This was a pain in the butt getting the calculations right... and then I refactored it out
 
-    if (isEvenRow) {
-      coordinateX = width - (centerOffset + xOffset);
-    }
+  // calcCoordinates(player) {
+  //   const { width } = game;
+  //   const { height } = game;
+  //   const gridCount = width / 10;
+  //   const centerOffset = gridCount / 2;
+  //   // @Position minus 1 because the row calculations only work 0-9, not 1-10
+  //   const position = this.players[player].position - 1;
+  //   const isEvenRow = Math.floor(position / 10) % 2 !== 0;
+  //   const yOffset = Math.floor(position / 10) * gridCount;
+  //   const xOffset = (position - Math.floor(position / 10) * 10) * gridCount;
+  //   let coordinateX = centerOffset + xOffset;
 
-    const coordinateY = height - (gridCount / 2 + yOffset);
+  //   if (isEvenRow) {
+  //     coordinateX = width - (centerOffset + xOffset);
+  //   }
 
-    return { coordinateX, coordinateY };
-  }
+  //   const coordinateY = height - (gridCount / 2 + yOffset);
 
-  setPlayerCoordinates(player, coordinates) {
-    this.players[player].coordinateX = coordinates.coordinateX;
-    // this.players[player].token.newTokenX = coordinates.coordinateX;
-    this.players[player].coordinateY = coordinates.coordinateY;
-    // this.players[player].token.newTokenY = coordinates.coordinateY;
-    this.players[player].token.setNewXY(
-      coordinates.coordinateX,
-      coordinates.coordinateY
-    );
-  }
+  //   return { coordinateX, coordinateY };
+  // }
 
-  // eslint-disable-next-line class-methods-use-this
-  move(playerPosition) {
+  // setPlayerCoordinates(player, coordinates) {
+  //   this.players[player].coordinateX = coordinates.coordinateX;
+  //   // this.players[player].token.newTokenX = coordinates.coordinateX;
+  //   this.players[player].coordinateY = coordinates.coordinateY;
+  //   // this.players[player].token.newTokenY = coordinates.coordinateY;
+  //   this.players[player].token.setNewXY(
+  //     coordinates.coordinateX,
+  //     coordinates.coordinateY
+  //   );
+  // }
+
+  setPlayerPosition() {
+    const playerPosition =
+      this.players[this.currentPlayer].position + this.diceTotal;
+
     const bouncedPosition =
       playerPosition > 100 ? 100 - (playerPosition - 100) : playerPosition;
-    if (snakes[bouncedPosition]) {
-      return snakes[bouncedPosition] + bouncedPosition;
+
+    switch (bouncedPosition) {
+      case snakes[bouncedPosition]:
+        this.players[this.currentPlayer].position =
+          snakes[bouncedPosition] + bouncedPosition;
+        break;
+      case ladders[bouncedPosition]:
+        this.players[this.currentPlayer].position =
+          ladders[bouncedPosition] + bouncedPosition;
+        break;
+      default:
+        this.players[this.currentPlayer].position = bouncedPosition;
     }
-    if (ladders[bouncedPosition]) {
-      return ladders[bouncedPosition] + bouncedPosition;
-    }
-    return bouncedPosition;
   }
 
-  movePlayerToken() {
-    const tokenPosition = this.calcCoordinates(this.currentPlayer);
-    this.setPlayerCoordinates(this.currentPlayer, tokenPosition);
-    // const drawX = this.players[this.currentPlayer].coordinateX;
-    // const drawY = this.players[this.currentPlayer].coordinateY;
-    // this.players[this.currentPlayer].token.draw(drawX, drawY);
-    this.players[this.currentPlayer].token.animationLoop();
+  getPlayerCoordinates(player) {
+    return this.gridReference[player.position - 1] || this.gridReference[0];
   }
 
   clearPlayerToken() {
-    const clearX = this.players[this.currentPlayer].coordinateX;
-    const clearY = this.players[this.currentPlayer].coordinateY;
+    const tokenPosition = this.getPlayerCoordinates(
+      this.players[this.currentPlayer]
+    );
+    const clearX = tokenPosition[0];
+    const clearY = tokenPosition[1];
     this.players[this.currentPlayer].token.clear(clearX, clearY);
+  }
+
+  movePlayerToken() {
+    const player = this.players[this.currentPlayer];
+    let drawX = this.getPlayerCoordinates(player)[0];
+    let drawY = this.getPlayerCoordinates(player)[1];
+    this.players[this.currentPlayer].token.draw(drawX, drawY);
+
+    this.players[this.currentPlayer].token.setNewXY(drawX, drawY);
+    // this.players[this.currentPlayer].token.animationLoop();
+
+    // Redraw second player
+    const secondPlayer = this.currentPlayer === 1 ? 2 : 1;
+
+    // eslint-disable-next-line prefer-destructuring
+    drawX = this.getPlayerCoordinates(this.players[secondPlayer])[0];
+    // eslint-disable-next-line prefer-destructuring
+    drawY = this.getPlayerCoordinates(this.players[secondPlayer])[1];
+    this.players[secondPlayer].token.draw(drawX, drawY);
   }
 
   play() {
@@ -150,14 +175,8 @@ class SnakesAndLadders {
     this.turnDice = this.rollDice();
     this.isDoubles = this.checkDoubles();
     this.diceTotal = this.rollTotal();
-
-    const newMove =
-      this.currentPlayer === 1
-        ? this.move(this.players[1].position + this.diceTotal)
-        : this.move(this.players[2].position + this.diceTotal);
-
-    // this.clearPlayerToken();
-    this.players[this.currentPlayer].position = newMove;
+    this.clearPlayerToken();
+    this.setPlayerPosition();
     this.movePlayerToken();
     this.victory = this.isWon();
 
