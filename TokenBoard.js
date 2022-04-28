@@ -1,23 +1,43 @@
 "use-strict";
 
-if (!document.querySelector("#game-tokens")) {
-  const canvas = document.createElement("canvas");
-  canvas.setAttribute("id", "game-tokens");
-  document.body.append(canvas);
+class TokenBoard {
+  canvas;
+
+  context;
+
+  constructor(boardContainer, size) {
+    this.boardContainer = boardContainer;
+    this.boardSize = size;
+    this.init();
+  }
+
+  setCanvas() {
+    if (!document.getElementById("token-board")) {
+      const canvas = document.createElement("canvas");
+      canvas.setAttribute("id", "token-board");
+      document.getElementById("game-container").appendChild(canvas);
+    }
+    this.canvas = document.getElementById("token-board");
+    this.canvas.width = this.boardSize;
+    this.canvas.height = this.boardSize;
+    this.context = this.canvas.getContext("2d");
+  }
+
+  draw(x, y, radius, fillStyle) {
+    const circle = new Path2D();
+    circle.arc(x, y, radius, 0, 2 * Math.PI);
+    this.context.fillStyle = fillStyle;
+    this.context.beginPath();
+    this.context.fill(circle);
+  }
+
+  clear() {
+    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+  }
+
+  init() {
+    this.setCanvas();
+  }
 }
 
-const tokenBoard = document.querySelector("#game-tokens");
-// eslint-disable-next-line no-unused-vars
-const tokenContext = tokenBoard.getContext("2d");
-
-function initTokens(inputSize) {
-  const isInputInteger = Number.isInteger(inputSize);
-  const requestedSize = isInputInteger ? Math.max(inputSize, 250) : 250;
-  const maxBoardSize = Math.min(window.innerHeight, window.innerWidth);
-  const boardSize = requestedSize < maxBoardSize ? requestedSize : maxBoardSize;
-
-  tokenBoard.width = boardSize;
-  tokenBoard.height = boardSize;
-}
-
-export { initTokens, tokenContext };
+export default TokenBoard;
