@@ -93,7 +93,7 @@ body {
   z-index: 0;
 }
 
-#game-tokens {
+#token-board {
   position: absolute;
   display: block;
   top: 0;
