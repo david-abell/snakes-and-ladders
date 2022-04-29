@@ -1,5 +1,6 @@
 "use-strict";
 
+// This will not work if a containerEl is not passed at initialization
 class GameBoard {
   canvas;
 
@@ -35,6 +36,9 @@ class GameBoard {
   };
 
   constructor(containerEl, size) {
+    if (!containerEl) throw new Error(`Missing container el`);
+    if (!size) throw new Error(`Missing size parameter`);
+
     this.containerEl = containerEl;
     this.boardSize = size;
     this.init();

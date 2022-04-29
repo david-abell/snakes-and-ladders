@@ -5,8 +5,11 @@ class TokenBoard {
 
   context;
 
-  constructor(boardContainer, size) {
-    this.boardContainer = boardContainer;
+  constructor(containerEl, size) {
+    if (!containerEl) throw new Error(`Missing container el`);
+    if (!size) throw new Error(`Missing size parameter`);
+
+    this.boardContainer = containerEl;
     this.boardSize = size;
     this.init();
   }
