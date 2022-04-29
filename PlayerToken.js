@@ -10,8 +10,8 @@ class PlayerToken {
   setPlayerColor() {
     const player = this.playerNumber;
     const colors = {
-      1: "red",
-      2: "blue",
+      1: "#FE7E6D",
+      2: "#51AEDC",
     };
     const selectedColor = colors[player];
     return selectedColor;

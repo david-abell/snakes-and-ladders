@@ -80,6 +80,26 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  background-color: #343c47;
+}
+
+h1,
+p,
+button {
+  font-family: "Lato", sans-serif;
+  color: #f9fafb;
+}
+
+h1 {
+  margin-block: 1rem;
+}
+
+button {
+  border-radius: 0.5rem;
+  padding-block: 0.5rem;
+  padding-inline: 2rem;
+  color: #343c47;
+  font-weight: 700;
 }
 
 .game-container {
@@ -87,10 +107,9 @@ body {
 }
 
 #game-board {
-  border: 2px solid lightgray;
   display: block;
-  background-color: rgb(230, 230, 230);
   z-index: 0;
+  border-radius: 0.5rem;
 }
 
 #token-board {
@@ -98,7 +117,7 @@ body {
   display: block;
   top: 0;
   left: 0;
-  z-index: 10;
+  z-index: 100;
 }
 
 #message {

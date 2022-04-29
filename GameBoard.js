@@ -57,6 +57,9 @@ class GameBoard {
   }
 
   drawGridLines() {
+    this.context.beginPath();
+    this.context.fillStyle = "#F9FAFB";
+    this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
     const { width } = this.canvas;
     const { height } = this.canvas;
     const gridCount = width / 10;
@@ -85,9 +88,10 @@ class GameBoard {
     // Create grid reference and Draw grid numbers
     this.context.stroke();
 
-    this.context.font = "30px Arial";
+    this.context.font = "20px Lato";
     this.context.textAlign = "center";
     this.context.textBaseline = "middle";
+    this.context.fillStyle = "#343C47";
 
     for (let i = 0; i < 100; i += 1) {
       const isEvenRow = Math.floor(i / 10) % 2 === 0;
