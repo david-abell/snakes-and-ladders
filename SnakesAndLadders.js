@@ -57,12 +57,12 @@ class SnakesAndLadders {
   }
 
   setBoardContainer() {
-    console.log(this.containerEl);
     if (!this.containerEl) {
-      const div = document.createElement("div");
-      div.setAttribute("id", "game-container");
-      div.classList.add("game-container");
-      document.body.appendChild(div);
+      const newDiv = document.createElement("div");
+      newDiv.setAttribute("id", "game-container");
+      newDiv.classList.add("game-container");
+      this.containerEl = newDiv;
+      document.body.appendChild(newDiv);
     }
   }
 
@@ -142,11 +142,11 @@ class SnakesAndLadders {
   // }
 
   // State saves current player number in callback since it updates variable before animation finishes
-  animate(state) {
+  animate(playerState) {
     let player = this.currentPlayer;
     let localOtherPlayer = this.otherPlayer;
-    if (state) {
-      player = state;
+    if (playerState) {
+      player = playerState;
       localOtherPlayer = player === 1 ? 2 : 1;
     }
     const playerXY = this.getGridReferenceXY(player);
@@ -172,10 +172,10 @@ class SnakesAndLadders {
     window.requestAnimationFrame(() => this.animate(player));
   }
 
-  setDrawPos(state) {
+  setDrawPos(playerState) {
     let player = this.currentPlayer;
-    if (state) {
-      player = state;
+    if (playerState) {
+      player = playerState;
     }
     this.players[player].drawPos += 1;
   }
@@ -190,6 +190,7 @@ class SnakesAndLadders {
     this.players[this.currentPlayer].position = bouncedPosition;
   }
 
+  // Does not work yet
   checkPortal() {
     // console.log("checking portal:", this.players[this.currentPlayer].position);
     if (this.gameBoard.snakes[this.players[this.currentPlayer].position]) {
@@ -212,10 +213,10 @@ class SnakesAndLadders {
     }
   }
 
-  getGridReferenceXY(state) {
-    if (state) {
+  getGridReferenceXY(playerState) {
+    if (playerState) {
       return (
-        this.gridReference[this.players[state].drawPos - 1] ||
+        this.gridReference[this.players[playerState].drawPos - 1] ||
         this.gridReference[0]
       );
     }
@@ -262,6 +263,7 @@ class SnakesAndLadders {
     this.players[1].token.y = this.gridReference[0][1];
     this.players[2].token.x = this.gridReference[0][0];
     this.players[2].token.y = this.gridReference[0][1];
+    this.animate();
   }
 }
 
