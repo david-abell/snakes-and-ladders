@@ -1,27 +1,33 @@
+/* eslint-disable prefer-destructuring */
+
 "use-strict";
 
-import getRandomDie from "./helpers.js";
-import { snakes, ladders, initBoard, game, context } from "./board.js";
+import { getRandomDie } from "./helpers.js";
+import GameBoard from "./GameBoard.js";
 import PlayerToken from "./PlayerToken.js";
-import initTokens from "./TokenBoard.js";
+// import { initTokens, tokenBoard, tokenContext } from "./TokenBoard.js";
+import TokenBoard from "./TokenBoard.js";
 
-// Update players to object?
 class SnakesAndLadders {
+  tokenBoard;
+
+  gameBoard;
+
   victory = false;
 
   currentPlayer = 1;
 
+  otherPlayer = 2;
+
   players = {
     1: {
       position: 0,
-      coordinateX: 0,
-      coordinateY: 0,
+      drawPos: 0,
       token: new PlayerToken(1),
     },
     2: {
       position: 0,
-      coordinateX: 0,
-      coordinateY: 0,
+      drawPos: 0,
       token: new PlayerToken(2),
     },
   };
@@ -34,8 +40,30 @@ class SnakesAndLadders {
 
   message = "";
 
-  constructor(boardSize = 800) {
-    this.boardSize = boardSize;
+  gridReference;
+
+  constructor(containerEl, size = 800) {
+    this.boardSize = size;
+    this.containerEl = containerEl;
+    this.init();
+  }
+
+  setBoardSize() {
+    const isInputInteger = Number.isInteger(this.boardSize);
+    const requestedSize = isInputInteger ? Math.max(this.boardSize, 250) : 250;
+    const maxBoardSize = Math.min(window.innerHeight, window.innerWidth);
+    const result = requestedSize < maxBoardSize ? requestedSize : maxBoardSize;
+    this.boardSize = result;
+  }
+
+  setBoardContainer() {
+    if (!this.containerEl) {
+      const newDiv = document.createElement("div");
+      newDiv.setAttribute("id", "game-container");
+      newDiv.classList.add("game-container");
+      this.containerEl = newDiv;
+      document.body.appendChild(newDiv);
+    }
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -55,6 +83,7 @@ class SnakesAndLadders {
 
   setCurrentPlayer() {
     this.currentPlayer = this.currentPlayer === 1 ? 2 : 1;
+    this.otherPlayer = this.currentPlayer === 1 ? 2 : 1;
   }
 
   samePlayerTurn() {
@@ -78,52 +107,123 @@ class SnakesAndLadders {
     return false;
   }
 
-  // This was a pain in the but getting the calculations right
-  calcCoordinates(player) {
-    const { width } = game;
-    const { height } = game;
-    const gridCount = width / 10;
-    const centerOffset = gridCount / 2;
-    // @Position minus 1 because the row calculations only work 0-9, not 1-10
-    const position = this.players[player].position - 1;
-    const isEvenRow = Math.floor(position / 10) % 2 !== 0;
-    const yOffset = Math.floor(position / 10) * gridCount;
-    const xOffset = (position - Math.floor(position / 10) * 10) * gridCount;
-    let coordinateX = centerOffset + xOffset;
+  // This was a pain in the butt getting the calculations right... and then I refactored it out
 
-    if (isEvenRow) {
-      coordinateX = width - (centerOffset + xOffset);
+  // calcCoordinates(player) {
+  //   const { width } = game;
+  //   const { height } = game;
+  //   const gridCount = width / 10;
+  //   const centerOffset = gridCount / 2;
+  //   // @Position minus 1 because the row calculations only work 0-9, not 1-10
+  //   const position = this.players[player].position - 1;
+  //   const isEvenRow = Math.floor(position / 10) % 2 !== 0;
+  //   const yOffset = Math.floor(position / 10) * gridCount;
+  //   const xOffset = (position - Math.floor(position / 10) * 10) * gridCount;
+  //   let coordinateX = centerOffset + xOffset;
+
+  //   if (isEvenRow) {
+  //     coordinateX = width - (centerOffset + xOffset);
+  //   }
+
+  //   const coordinateY = height - (gridCount / 2 + yOffset);
+
+  //   return { coordinateX, coordinateY };
+  // }
+
+  // setPlayerCoordinates(player, coordinates) {
+  //   this.players[player].coordinateX = coordinates.coordinateX;
+  //   // this.players[player].token.newTokenX = coordinates.coordinateX;
+  //   this.players[player].coordinateY = coordinates.coordinateY;
+  //   // this.players[player].token.newTokenY = coordinates.coordinateY;
+  //   this.players[player].token.setNewXY(
+  //     coordinates.coordinateX,
+  //     coordinates.coordinateY
+  //   );
+  // }
+
+  // State saves current player number in callback since it updates variable before animation finishes
+  animate(playerState) {
+    let player = this.currentPlayer;
+    let localOtherPlayer = this.otherPlayer;
+    if (playerState) {
+      player = playerState;
+      localOtherPlayer = player === 1 ? 2 : 1;
     }
+    const playerXY = this.getGridReferenceXY(player);
+    const otherXY = this.getGridReferenceXY(localOtherPlayer);
 
-    const coordinateY = height - (gridCount / 2 + yOffset);
+    this.tokenBoard.clear();
+    this.tokenBoard.draw(
+      ...otherXY,
+      this.players[localOtherPlayer].token.radius,
+      this.players[localOtherPlayer].token.playerColor
+    );
+    this.tokenBoard.draw(
+      ...playerXY,
+      this.players[player].token.radius,
+      this.players[player].token.playerColor
+    );
+    if (this.players[player].drawPos > this.players[player].position - 1) {
+      this.players[player].drawPos = this.players[player].position;
+      return;
+    }
+    this.setDrawPos(player);
 
-    return { coordinateX, coordinateY };
+    window.requestAnimationFrame(() => this.animate(player));
   }
 
-  setPlayerCoordinates(player, coordinateObject) {
-    this.players[player].coordinateX = coordinateObject.coordinateX;
-    this.players[player].coordinateY = coordinateObject.coordinateY;
+  setDrawPos(playerState) {
+    let player = this.currentPlayer;
+    if (playerState) {
+      player = playerState;
+    }
+    this.players[player].drawPos += 1;
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  move(playerPosition) {
+  setPlayerPosition() {
+    const playerPosition =
+      this.players[this.currentPlayer].position + this.diceTotal;
+
     const bouncedPosition =
       playerPosition > 100 ? 100 - (playerPosition - 100) : playerPosition;
-    if (snakes[bouncedPosition]) {
-      return snakes[bouncedPosition] + bouncedPosition;
-    }
-    if (ladders[bouncedPosition]) {
-      return ladders[bouncedPosition] + bouncedPosition;
-    }
-    return bouncedPosition;
+
+    this.players[this.currentPlayer].position = bouncedPosition;
   }
 
-  movePlayerToken() {
-    const tokenPosition = this.calcCoordinates(this.currentPlayer);
-    this.setPlayerCoordinates(this.currentPlayer, tokenPosition);
-    const drawX = this.players[this.currentPlayer].coordinateX;
-    const drawY = this.players[this.currentPlayer].coordinateY;
-    this.players[this.currentPlayer].token.draw(drawX, drawY, context);
+  // Does not work yet
+  checkPortal() {
+    // console.log("checking portal:", this.players[this.currentPlayer].position);
+    if (this.gameBoard.snakes[this.players[this.currentPlayer].position]) {
+      this.players[this.currentPlayer].position +=
+        this.gameBoard.snakes[this.players[this.currentPlayer].position];
+      this.players[this.currentPlayer].token.animate(
+        this.players[this.currentPlayer].position,
+        true
+      );
+      // console.log("portal found:", this.players[this.currentPlayer].position);
+    }
+    if (this.gameBoard.ladders[this.players[this.currentPlayer].position]) {
+      this.players[this.currentPlayer].position +=
+        this.gameBoard.ladders[this.players[this.currentPlayer].position];
+      this.players[this.currentPlayer].token.animate(
+        this.players[this.currentPlayer].position,
+        true
+      );
+      // console.log("portal found:", this.players[this.currentPlayer].position);
+    }
+  }
+
+  getGridReferenceXY(playerState) {
+    if (playerState) {
+      return (
+        this.gridReference[this.players[playerState].drawPos - 1] ||
+        this.gridReference[0]
+      );
+    }
+    return (
+      this.gridReference[this.players[this.currentPlayer].drawPos - 1] ||
+      this.gridReference[0]
+    );
   }
 
   play() {
@@ -135,14 +235,9 @@ class SnakesAndLadders {
     this.turnDice = this.rollDice();
     this.isDoubles = this.checkDoubles();
     this.diceTotal = this.rollTotal();
-
-    const newMove =
-      this.currentPlayer === 1
-        ? this.move(this.players[1].position + this.diceTotal)
-        : this.move(this.players[2].position + this.diceTotal);
-
-    this.players[this.currentPlayer].position = newMove;
-    this.movePlayerToken();
+    this.setPlayerPosition();
+    this.animate();
+    // this.checkPortal();
     this.victory = this.isWon();
 
     if (this.victory) {
@@ -159,8 +254,16 @@ class SnakesAndLadders {
   }
 
   init() {
-    initBoard(this.boardSize);
-    initTokens(this.boardSize);
+    this.setBoardContainer();
+    this.setBoardSize();
+    this.gameBoard = new GameBoard(this.containerEl, this.boardSize);
+    this.tokenBoard = new TokenBoard(this.containerEl, this.boardSize);
+    this.gridReference = this.gameBoard.gridReference;
+    this.players[1].token.x = this.gridReference[0][0];
+    this.players[1].token.y = this.gridReference[0][1];
+    this.players[2].token.x = this.gridReference[0][0];
+    this.players[2].token.y = this.gridReference[0][1];
+    this.animate();
   }
 }
 

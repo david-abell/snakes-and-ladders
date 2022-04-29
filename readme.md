@@ -27,19 +27,28 @@ It should have:
 - a winner should be declared when one player manages to reach the final space
 - there should be a button to start a new game once victory is declared
 
+## Technology used
+
+- Jest testing framework
+- eslint
+- prettier
+
 ## Why I built it this way
 
 - project was a good playground for practicing with JavaScript classes
 - meaningful way to learn industry standard testing skills
 
-## Technology used
+## Lessons learned/ problems encountered
 
-- Jest testing framework
+- Jest doesn't support canvas out of box, had to install jest-canvas-mock
+- Player token movement was extremely complicated until I pregenerated coordinates and just drew array indexes.
+- Separation of methods into correct place. Initially built draw methods into a player token class, duplicating methods with each instance and requiring to many variables getting passed back and forth.
+- Draw animations were too complicated until I stopped trying to clear portions of the board and did full wipe and redraws.
 
 ## Available scripts
 
 ```bash
-npm run test
+npm test
 ```
 
 ## Credits

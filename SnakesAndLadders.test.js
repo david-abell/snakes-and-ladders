@@ -1,6 +1,9 @@
 import SnakesAndLadders from "./SnakesAndLadders.js";
 
 describe("Properties", () => {
+  beforeEach(() => {
+    document.body.innerHTML = `<div id="game-container"></div>`;
+  });
   test("Player should get another turn when doubles are rolled", () => {
     const game = new SnakesAndLadders();
     jest
@@ -10,7 +13,6 @@ describe("Properties", () => {
       .mockReturnValueOnce({ die1: 1, die2: 2 })
       .mockReturnValueOnce({ die1: 3, die2: 3 })
       .mockReturnValueOnce({ die1: 2, die2: 3 });
-
     game.play();
     expect(game.isDoubles).toBe(true);
     game.play();
@@ -29,6 +31,10 @@ describe("Properties", () => {
 });
 
 describe("method roll dice", () => {
+  beforeEach(() => {
+    document.body.innerHTML = `<div id="game-container"></div>`;
+  });
+
   test("should return two dice with number values", () => {
     const game = new SnakesAndLadders();
     const value = game.rollDice();
@@ -50,9 +56,15 @@ describe("method roll dice", () => {
   });
 });
 
+// Fails because portals disabled
 describe("incomplete four dice roll game", () => {
+  beforeEach(() => {
+    document.body.innerHTML = `<div id="game-container"></div>`;
+  });
+
   test("it should create new game board and roll dice four times", () => {
     const game = new SnakesAndLadders();
+
     jest
       .spyOn(game, "rollDice")
       .mockReturnValueOnce({ die1: 1, die2: 1 })
@@ -72,6 +84,10 @@ describe("incomplete four dice roll game", () => {
 });
 
 describe("Game ending", () => {
+  beforeEach(() => {
+    document.body.innerHTML = `<div id="game-container"></div>`;
+  });
+
   test("should declare a winner", () => {
     const game = new SnakesAndLadders();
     game.players[1].position = 98;
@@ -91,3 +107,24 @@ describe("Game ending", () => {
     expect(game.message).toBe("Game over! Player 1 has won!");
   });
 });
+
+// test("too large", () => {
+//   const game = new GameBoard(undefined, 2000);
+//   expect(game.height).toBe(980);
+// });
+// test("too small", () => {
+//   const game = new GameBoard(undefined, 20);
+//   expect(game.height).toBe(250);
+// });
+// test("decimal", () => {
+//   const game = new GameBoard(undefined, 0.8);
+//   expect(game.height).toBe(250);
+// });
+// test("400px", () => {
+//   const game = new GameBoard(undefined, "400px");
+//   expect(game.height).toBe(250);
+// });
+// test("0", () => {
+//   const game = new GameBoard();
+//   expect(game.height).toBe(250);
+// });

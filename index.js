@@ -2,9 +2,10 @@
 
 import SnakesAndLadders from "./SnakesAndLadders.js";
 
-const game = new SnakesAndLadders(600);
+const gameBoards = document.getElementById("game-container");
+const game = new SnakesAndLadders(gameBoards, 600);
 
-window.onload = game.init();
+// window.onload = game.init();
 
 const playButton = document.querySelector("#play-turn");
 const message = document.querySelector("#message");
