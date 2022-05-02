@@ -2,7 +2,7 @@
 
 "use-strict";
 
-import { getRandomDie } from "./helpers.js";
+import { getRandomDie, getSlope, getIntercept } from "./helpers.js";
 import GameBoard from "./GameBoard.js";
 import PlayerToken from "./PlayerToken.js";
 // import { initTokens, tokenBoard, tokenContext } from "./TokenBoard.js";
@@ -105,62 +105,29 @@ class SnakesAndLadders {
     return false;
   }
 
-  // This was a pain in the butt getting the calculations right... and then I refactored it out
-
-  // calcCoordinates(player) {
-  //   const { width } = game;
-  //   const { height } = game;
-  //   const gridCount = width / 10;
-  //   const centerOffset = gridCount / 2;
-  //   // @Position minus 1 because the row calculations only work 0-9, not 1-10
-  //   const position = this.players[player].position - 1;
-  //   const isEvenRow = Math.floor(position / 10) % 2 !== 0;
-  //   const yOffset = Math.floor(position / 10) * gridCount;
-  //   const xOffset = (position - Math.floor(position / 10) * 10) * gridCount;
-  //   let coordinateX = centerOffset + xOffset;
-
-  //   if (isEvenRow) {
-  //     coordinateX = width - (centerOffset + xOffset);
-  //   }
-
-  //   const coordinateY = height - (gridCount / 2 + yOffset);
-
-  //   return { coordinateX, coordinateY };
-  // }
-
-  // setPlayerCoordinates(player, coordinates) {
-  //   this.players[player].coordinateX = coordinates.coordinateX;
-  //   // this.players[player].token.newTokenX = coordinates.coordinateX;
-  //   this.players[player].coordinateY = coordinates.coordinateY;
-  //   // this.players[player].token.newTokenY = coordinates.coordinateY;
-  //   this.players[player].token.setNewXY(
-  //     coordinates.coordinateX,
-  //     coordinates.coordinateY
-  //   );
-  // }
-
-  // State saves current player number in callback since it updates variable before animation finishes
+  // State saves current player number for correct requestAnimationFrame data
   animate(playerState) {
     let player = this.currentPlayer;
-    let localOtherPlayer = this.otherPlayer;
+    let otherPlayerState = this.otherPlayer;
     if (playerState) {
       player = playerState;
-      localOtherPlayer = player === 1 ? 2 : 1;
+      otherPlayerState = player === 1 ? 2 : 1;
     }
-    const playerXY = this.getGridReferenceXY(player);
-    const otherXY = this.getGridReferenceXY(localOtherPlayer);
+    const playerXY = this.getDrawPositionGridReference(player);
+    const otherXY = this.getDrawPositionGridReference(otherPlayerState);
 
     this.tokenBoard.clear();
     this.tokenBoard.draw(
       ...otherXY,
-      this.players[localOtherPlayer].token.radius,
-      this.players[localOtherPlayer].token.playerColor
+      this.players[otherPlayerState].token.radius,
+      this.players[otherPlayerState].token.playerColor
     );
     this.tokenBoard.draw(
       ...playerXY,
       this.players[player].token.radius,
       this.players[player].token.playerColor
     );
+
     if (this.players[player].drawPos > this.players[player].position - 1) {
       this.players[player].drawPos = this.players[player].position;
       return;
@@ -168,6 +135,88 @@ class SnakesAndLadders {
     this.setDrawPos(player);
 
     window.requestAnimationFrame(() => this.animate(player));
+  }
+
+  animatePortal(playerState, xyArr) {
+    let player = this.currentPlayer;
+    let otherPlayerState = this.otherPlayer;
+    if (playerState) {
+      player = playerState;
+      otherPlayerState = player === 1 ? 2 : 1;
+    }
+    const playerXY = xyArr || this.getDrawPositionGridReference(player);
+    const otherXY = this.getDrawPositionGridReference(otherPlayerState);
+
+    this.tokenBoard.clear();
+    this.tokenBoard.draw(
+      ...otherXY,
+      this.players[otherPlayerState].token.radius,
+      this.players[otherPlayerState].token.playerColor
+    );
+    this.tokenBoard.draw(
+      ...playerXY,
+      this.players[player].token.radius,
+      this.players[player].token.playerColor
+    );
+    const nextDrawXY = this.getNextDrawPoint(
+      playerXY,
+      this.getPositionGridReference(player)
+    );
+    const startPosition = this.getDrawPositionGridReference(player);
+    const endPosition = this.getPositionGridReference(player);
+    const isDrawXGreaterThanEndX = nextDrawXY[0] > endPosition[0];
+    const isDrawYGreaterThanEndY = nextDrawXY[1] > endPosition[1];
+    const doesPortalGoLeft = startPosition[0] > endPosition[0];
+    const isLadder = startPosition[1] < endPosition[1];
+
+    if (
+      isLadder &&
+      doesPortalGoLeft &&
+      !isDrawXGreaterThanEndX &&
+      isDrawYGreaterThanEndY
+    ) {
+      this.setDrawPosToPosition(player);
+      return;
+    }
+
+    if (
+      isLadder &&
+      !doesPortalGoLeft &&
+      isDrawXGreaterThanEndX &&
+      isDrawYGreaterThanEndY
+    ) {
+      this.setDrawPosToPosition(player);
+      return;
+    }
+
+    if (
+      !isLadder &&
+      doesPortalGoLeft &&
+      !isDrawXGreaterThanEndX &&
+      !isDrawYGreaterThanEndY
+    ) {
+      this.setDrawPosToPosition(player);
+      return;
+    }
+
+    if (
+      !isLadder &&
+      !doesPortalGoLeft &&
+      isDrawXGreaterThanEndX &&
+      !isDrawYGreaterThanEndY
+    ) {
+      this.setDrawPosToPosition(player);
+      return;
+    }
+    window.requestAnimationFrame(() => this.animatePortal(player, nextDrawXY));
+  }
+
+  setDrawPosToPosition(playerState) {
+    let player = this.currentPlayer;
+    if (playerState) {
+      player = playerState;
+    }
+    this.players[player].drawPos = this.players[player].position;
   }
 
   setDrawPos(playerState) {
@@ -188,30 +237,23 @@ class SnakesAndLadders {
     this.players[this.currentPlayer].position = bouncedPosition;
   }
 
-  // Does not work yet
-  checkPortal() {
-    // console.log("checking portal:", this.players[this.currentPlayer].position);
-    if (this.gameBoard.snakes[this.players[this.currentPlayer].position]) {
-      this.players[this.currentPlayer].position +=
-        this.gameBoard.snakes[this.players[this.currentPlayer].position];
-      this.players[this.currentPlayer].token.animate(
-        this.players[this.currentPlayer].position,
-        true
-      );
-      // console.log("portal found:", this.players[this.currentPlayer].position);
+  // eslint-disable-next-line class-methods-use-this
+  getNextDrawPoint(startPoint, endPoint) {
+    const [x1, y1] = startPoint;
+    const [x2, y2] = endPoint;
+    const slope = getSlope(x1, y1, x2, y2);
+    let newY;
+    const newX = x1 > x2 ? x1 - 5 : x1 + 5;
+    const intercept = getIntercept(x1, y1, slope);
+    if (Number.isFinite(slope) && slope !== 0) {
+      newY = slope * newX + intercept;
+    } else {
+      newY = y2;
     }
-    if (this.gameBoard.ladders[this.players[this.currentPlayer].position]) {
-      this.players[this.currentPlayer].position +=
-        this.gameBoard.ladders[this.players[this.currentPlayer].position];
-      this.players[this.currentPlayer].token.animate(
-        this.players[this.currentPlayer].position,
-        true
-      );
-      // console.log("portal found:", this.players[this.currentPlayer].position);
-    }
+    return [newX, newY];
   }
 
-  getGridReferenceXY(playerState) {
+  getDrawPositionGridReference(playerState) {
     if (playerState) {
       return (
         this.gridReference[this.players[playerState].drawPos - 1] ||
@@ -224,6 +266,36 @@ class SnakesAndLadders {
     );
   }
 
+  getPositionGridReference(playerState) {
+    if (playerState) {
+      return (
+        this.gridReference[this.players[playerState].position - 1] ||
+        this.gridReference[0]
+      );
+    }
+    return (
+      this.gridReference[this.players[this.currentPlayer].position - 1] ||
+      this.gridReference[0]
+    );
+  }
+
+  checkPortal() {
+    const isSnakePortal =
+      this.gameBoard.snakes[this.players[this.currentPlayer].position];
+    if (isSnakePortal) {
+      this.players[this.currentPlayer].position +=
+        this.gameBoard.snakes[this.players[this.currentPlayer].position];
+      this.animatePortal();
+    }
+    const isLadderPortal =
+      this.gameBoard.ladders[this.players[this.currentPlayer].position];
+    if (isLadderPortal) {
+      this.players[this.currentPlayer].position +=
+        this.gameBoard.ladders[this.players[this.currentPlayer].position];
+      this.animatePortal();
+    }
+  }
+
   play() {
     if (this.victory) {
       this.message = `Game over! Player ${this.currentPlayer} has won!`;
@@ -234,7 +306,7 @@ class SnakesAndLadders {
     this.diceTotal = this.rollTotal();
     this.setPlayerPosition();
     this.animate();
-    // this.checkPortal();
+    this.checkPortal();
     this.victory = this.isWon();
 
     if (this.victory) {
