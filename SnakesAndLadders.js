@@ -130,6 +130,7 @@ class SnakesAndLadders {
 
     if (this.players[player].drawPos > this.players[player].position - 1) {
       this.players[player].drawPos = this.players[player].position;
+      this.checkPortal();
       return;
     }
     this.setDrawPos(player);
@@ -164,10 +165,27 @@ class SnakesAndLadders {
     );
     const startPosition = this.getDrawPositionGridReference(player);
     const endPosition = this.getPositionGridReference(player);
-    const isDrawXGreaterThanEndX = nextDrawXY[0] > endPosition[0];
-    const isDrawYGreaterThanEndY = nextDrawXY[1] > endPosition[1];
+    const isDrawXGreaterThanEndX = nextDrawXY[0] >= endPosition[0];
+    const isDrawYGreaterThanEndY = nextDrawXY[1] >= endPosition[1];
     const doesPortalGoLeft = startPosition[0] > endPosition[0];
+    const isPortalVertical = startPosition[0] === endPosition[0];
     const isLadder = startPosition[1] < endPosition[1];
+    if (nextDrawXY[0] === endPosition[0] && nextDrawXY[1] === endPosition[1]) {
+      this.setDrawPosToPosition(player);
+      this.finishTurn();
+      return;
+    }
+    if (isPortalVertical && isLadder && isDrawYGreaterThanEndY) {
+      this.setDrawPosToPosition(player);
+      this.finishTurn();
+      return;
+    }
+
+    if (isPortalVertical && !isLadder && !isDrawYGreaterThanEndY) {
+      this.setDrawPosToPosition(player);
+      this.finishTurn();
+      return;
+    }
 
     if (
       isLadder &&
@@ -176,6 +194,7 @@ class SnakesAndLadders {
       isDrawYGreaterThanEndY
     ) {
       this.setDrawPosToPosition(player);
+      this.finishTurn();
       return;
     }
 
@@ -186,6 +205,7 @@ class SnakesAndLadders {
       isDrawYGreaterThanEndY
     ) {
       this.setDrawPosToPosition(player);
+      this.finishTurn();
       return;
     }
 
@@ -196,6 +216,7 @@ class SnakesAndLadders {
       !isDrawYGreaterThanEndY
     ) {
       this.setDrawPosToPosition(player);
+      this.finishTurn();
       return;
     }
 
@@ -206,6 +227,7 @@ class SnakesAndLadders {
       !isDrawYGreaterThanEndY
     ) {
       this.setDrawPosToPosition(player);
+      this.finishTurn();
       return;
     }
     window.requestAnimationFrame(() => this.animatePortal(player, nextDrawXY));
@@ -286,6 +308,7 @@ class SnakesAndLadders {
       this.players[this.currentPlayer].position +=
         this.gameBoard.snakes[this.players[this.currentPlayer].position];
       this.animatePortal();
+      return;
     }
     const isLadderPortal =
       this.gameBoard.ladders[this.players[this.currentPlayer].position];
@@ -293,7 +316,9 @@ class SnakesAndLadders {
       this.players[this.currentPlayer].position +=
         this.gameBoard.ladders[this.players[this.currentPlayer].position];
       this.animatePortal();
+      return;
     }
+    this.finishTurn();
   }
 
   play() {
@@ -306,7 +331,9 @@ class SnakesAndLadders {
     this.diceTotal = this.rollTotal();
     this.setPlayerPosition();
     this.animate();
-    this.checkPortal();
+  }
+
+  finishTurn() {
     this.victory = this.isWon();
 
     if (this.victory) {
