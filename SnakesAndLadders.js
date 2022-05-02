@@ -36,8 +36,6 @@ class SnakesAndLadders {
 
   diceTotal = null;
 
-  isDoubles = false;
-
   message = "";
 
   gridReference;
@@ -73,7 +71,7 @@ class SnakesAndLadders {
     return { die1, die2 };
   }
 
-  checkDoubles() {
+  isDoubles() {
     return this.turnDice.die1 === this.turnDice.die2;
   }
 
@@ -233,7 +231,6 @@ class SnakesAndLadders {
     }
 
     this.turnDice = this.rollDice();
-    this.isDoubles = this.checkDoubles();
     this.diceTotal = this.rollTotal();
     this.setPlayerPosition();
     this.animate();
@@ -245,12 +242,12 @@ class SnakesAndLadders {
       return;
     }
 
-    if (this.isDoubles) {
+    if (this.isDoubles()) {
       this.samePlayerTurn();
-      return;
+    } else {
+      this.setCurrentPlayer();
+      this.nextPlayerTurn();
     }
-    this.setCurrentPlayer();
-    this.nextPlayerTurn();
   }
 
   init() {

@@ -14,18 +14,18 @@ describe("Properties", () => {
       .mockReturnValueOnce({ die1: 3, die2: 3 })
       .mockReturnValueOnce({ die1: 2, die2: 3 });
     game.play();
-    expect(game.isDoubles).toBe(true);
+    expect(game.isDoubles()).toBe(true);
     game.play();
-    expect(game.isDoubles).toBe(true);
+    expect(game.isDoubles()).toBe(true);
     expect(game.currentPlayer).toBe(1);
     game.play();
-    expect(game.isDoubles).toBe(false);
+    expect(game.isDoubles()).toBe(false);
     expect(game.currentPlayer).toBe(2);
     game.play();
-    expect(game.isDoubles).toBe(true);
+    expect(game.isDoubles()).toBe(true);
     expect(game.currentPlayer).toBe(2);
     game.play();
-    expect(game.isDoubles).toBe(false);
+    expect(game.isDoubles()).toBe(false);
     expect(game.currentPlayer).toBe(1);
   });
 });
