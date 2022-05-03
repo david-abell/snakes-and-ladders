@@ -54,7 +54,7 @@ class SnakesAndLadders {
     this.boardSize = result;
   }
 
-  setBoardContainer() {
+  setContainerEl() {
     if (!this.containerEl) {
       const newDiv = document.createElement("div");
       newDiv.setAttribute("id", "game-container");
@@ -350,7 +350,7 @@ class SnakesAndLadders {
   }
 
   init() {
-    this.setBoardContainer();
+    this.setContainerEl();
     this.setBoardSize();
     this.gameBoard = new GameBoard(this.containerEl, this.boardSize);
     this.tokenBoard = new TokenBoard(this.containerEl, this.boardSize);
