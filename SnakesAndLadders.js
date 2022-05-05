@@ -379,7 +379,6 @@ class SnakesAndLadders {
       return true;
     }
     return false;
-    // this.finishTurn();
   }
 
   animationcomplete() {
@@ -436,10 +435,6 @@ class SnakesAndLadders {
     this.gameBoard = new GameBoard(this.containerEl, this.boardSize);
     this.tokenBoard = new TokenBoard(this.containerEl, this.boardSize);
     this.gridReference = this.gameBoard.gridReference;
-    // this.players[1].token.x = this.gridReference[0][0];
-    // this.players[1].token.y = this.gridReference[0][1];
-    // this.players[2].token.x = this.gridReference[0][0];
-    // this.players[2].token.y = this.gridReference[0][1];
     this.animate();
   }
 }
