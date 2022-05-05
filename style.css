@@ -85,8 +85,21 @@ body {
 
 h1,
 p,
-button {
+button,
+li {
   font-family: "Lato", sans-serif;
+}
+
+p,
+button,
+li {
+  font-size: 1.2rem;
+  line-height: 1.3;
+}
+
+h1,
+p,
+button {
   color: #f9fafb;
 }
 
@@ -100,6 +113,13 @@ button {
   padding-inline: 2rem;
   color: #343c47;
   font-weight: 700;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  margin-block-end: 1em;
+  gap: 1em;
 }
 
 .game-container {
@@ -118,8 +138,27 @@ button {
   top: 0;
   left: 0;
   z-index: 100;
+  border-radius: 0.5rem;
 }
 
-#message {
-  padding-block: 1em;
+.messages {
+  background-color: #f9fafb;
+  margin: 0;
+  padding: 1em;
+  border-radius: 0.5rem;
+  width: 250px;
+  height: 600px;
+  word-wrap: break-word;
+  overflow: auto;
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.messages li {
+  font-family: "Lato", sans-serif;
+  color: #343c47;
+  padding-block: 0.5em;
+  border-bottom: 1px dotted #343c47;
+
+  /* margin-inline-start: 16px; */
 }
