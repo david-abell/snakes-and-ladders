@@ -12,7 +12,6 @@ playButton.addEventListener("click", async () => {
   const turnResult = await game.play();
   turnResult.forEach((el) => {
     const { message, playerColor } = el;
-    console.log(message, playerColor);
     const newMessage = document.createElement("li");
     newMessage.style.color = playerColor;
     newMessage.innerText = message;
