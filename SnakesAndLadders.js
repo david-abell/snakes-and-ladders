@@ -5,7 +5,6 @@
 import { getRandomDie, getSlope, getIntercept } from "./helpers.js";
 import GameBoard from "./GameBoard.js";
 import PlayerToken from "./PlayerToken.js";
-// import { initTokens, tokenBoard, tokenContext } from "./TokenBoard.js";
 import TokenBoard from "./TokenBoard.js";
 
 class SnakesAndLadders {
@@ -14,6 +13,8 @@ class SnakesAndLadders {
   gameBoard;
 
   victory = false;
+
+  turnTotal = 0;
 
   currentPlayer = 1;
 
@@ -54,7 +55,8 @@ class SnakesAndLadders {
         this.players[this.currentPlayer].position
       }`,
     victory: () => `Player ${this.currentPlayer} Wins!`,
-    gameOver: () => `Game over! Player ${this.currentPlayer} has won!`,
+    gameOver: () =>
+      `Game over! Player ${this.currentPlayer} has won in ${this.turnTotal} turns`,
   };
 
   turnMessages = [];
@@ -397,6 +399,7 @@ class SnakesAndLadders {
     if (!this.readyForNextTurn) {
       return [];
     }
+    this.turnTotal += 1;
     this.readyForNextTurn = false;
     this.turnMessages = [];
     this.turnDice = this.rollDice();
@@ -433,10 +436,10 @@ class SnakesAndLadders {
     this.gameBoard = new GameBoard(this.containerEl, this.boardSize);
     this.tokenBoard = new TokenBoard(this.containerEl, this.boardSize);
     this.gridReference = this.gameBoard.gridReference;
-    this.players[1].token.x = this.gridReference[0][0];
-    this.players[1].token.y = this.gridReference[0][1];
-    this.players[2].token.x = this.gridReference[0][0];
-    this.players[2].token.y = this.gridReference[0][1];
+    // this.players[1].token.x = this.gridReference[0][0];
+    // this.players[1].token.y = this.gridReference[0][1];
+    // this.players[2].token.x = this.gridReference[0][0];
+    // this.players[2].token.y = this.gridReference[0][1];
     this.animate();
   }
 }
