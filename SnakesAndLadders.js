@@ -38,7 +38,33 @@ class SnakesAndLadders {
 
   message = "";
 
+  messages = {
+    samePlayerTurn: () =>
+      `Player ${this.currentPlayer} rolled doubles and gets to roll again`,
+    // nextPlayerTurn: () => `Player ${this.currentPlayer} rolled doubles and gets to roll again`,
+    move: () =>
+      `Player ${this.currentPlayer} is on square ${
+        this.players[this.currentPlayer].position
+      }`,
+    ladder: () =>
+      `Player ${this.currentPlayer} landed on a ladder and climbed to square ${
+        this.players[this.currentPlayer].position
+      }`,
+    snake: () =>
+      `Player ${this.currentPlayer} landed on a snake and fell to square ${
+        this.players[this.currentPlayer].position
+      }`,
+    victory: () => `Player ${this.currentPlayer} Wins!`,
+    gameOver: () => `Game over! Player ${this.currentPlayer} has won!`,
+  };
+
+  turnMessages = [];
+
   gridReference;
+
+  readyToAnimate = true;
+
+  readyForNextTurn = true;
 
   constructor(containerEl, size = 800) {
     this.boardSize = size;
@@ -64,6 +90,17 @@ class SnakesAndLadders {
     }
   }
 
+  setTurnMessages(message, isPlayer) {
+    const playerColor = isPlayer
+      ? this.players[this.currentPlayer].token.playerColor
+      : false;
+    const result = {
+      message,
+      playerColor,
+    };
+    this.turnMessages.push(result);
+  }
+
   // eslint-disable-next-line class-methods-use-this
   rollDice() {
     const die1 = getRandomDie();
@@ -85,17 +122,11 @@ class SnakesAndLadders {
   }
 
   samePlayerTurn() {
-    this.message =
-      this.currentPlayer === 1
-        ? `Player 1 is on square ${this.players[1].position}`
-        : `Player 2 is on square ${this.players[2].position}`;
+    this.setTurnMessages(this.messages.samePlayerTurn());
   }
 
   nextPlayerTurn() {
-    this.message =
-      this.currentPlayer === 1
-        ? `Player 2 is on square ${this.players[2].position}`
-        : `Player 1 is on square ${this.players[1].position}`;
+    this.setTurnMessages(this.messages.nextPlayerTurn());
   }
 
   isWon() {
@@ -105,22 +136,23 @@ class SnakesAndLadders {
     return false;
   }
 
-  // State saves current player number for correct requestAnimationFrame data
-  animate(playerState) {
-    let player = this.currentPlayer;
-    let otherPlayerState = this.otherPlayer;
-    if (playerState) {
-      player = playerState;
-      otherPlayerState = player === 1 ? 2 : 1;
-    }
+  animateStep(props) {
+    const animationState = props;
+    animationState.done = animationState.cleanup;
+    animationState.player = animationState.player || this.currentPlayer;
+    const player = animationState.player || this.currentPlayer;
+    animationState.otherPlayer = animationState.otherPlayer || this.otherPlayer;
+
     const playerXY = this.getDrawPositionGridReference(player);
-    const otherXY = this.getDrawPositionGridReference(otherPlayerState);
+    const otherXY = this.getDrawPositionGridReference(
+      animationState.otherPlayer
+    );
 
     this.tokenBoard.clear();
     this.tokenBoard.draw(
       ...otherXY,
-      this.players[otherPlayerState].token.radius,
-      this.players[otherPlayerState].token.playerColor
+      this.players[animationState.otherPlayer].token.radius,
+      this.players[animationState.otherPlayer].token.playerColor
     );
     this.tokenBoard.draw(
       ...playerXY,
@@ -130,29 +162,65 @@ class SnakesAndLadders {
 
     if (this.players[player].drawPos > this.players[player].position - 1) {
       this.players[player].drawPos = this.players[player].position;
-      this.checkPortal();
-      return;
+      animationState.cleanup = true;
     }
-    this.setDrawPos(player);
+    if (animationState.cleanup) {
+      this.setDrawPosToPosition(player);
+    } else {
+      this.setDrawPos(player);
+    }
 
-    window.requestAnimationFrame(() => this.animate(player));
+    window.requestAnimationFrame(() => this.animate(animationState));
   }
 
-  animatePortal(playerState, xyArr) {
-    let player = this.currentPlayer;
-    let otherPlayerState = this.otherPlayer;
-    if (playerState) {
-      player = playerState;
-      otherPlayerState = player === 1 ? 2 : 1;
+  animate(props) {
+    const animationState = props ?? {
+      done: false,
+      cleanup: false,
+      player: null,
+      otherPlayer: null,
+    };
+    this.readyToAnimate = animationState.done;
+
+    if (!animationState.done) {
+      this.animateStep(animationState);
     }
-    const playerXY = xyArr || this.getDrawPositionGridReference(player);
-    const otherXY = this.getDrawPositionGridReference(otherPlayerState);
+  }
+
+  animatePortal(props) {
+    const animationState = props ?? {
+      done: false,
+      cleanup: false,
+      player: null,
+      otherPlayer: null,
+      xy: null,
+    };
+    this.readyToAnimate = animationState.done;
+
+    if (!animationState.done) {
+      this.animatePortalStep(animationState);
+    }
+  }
+
+  animatePortalStep(props) {
+    const animationState = props;
+    animationState.done = animationState.cleanup;
+    animationState.player = animationState.player || this.currentPlayer;
+    animationState.otherPlayer = animationState.otherPlayer || this.otherPlayer;
+    const player = animationState.player || this.currentPlayer;
+    animationState.xy =
+      animationState.xy || this.getDrawPositionGridReference(player);
+
+    const playerXY = animationState.xy;
+    const otherXY = this.getDrawPositionGridReference(
+      animationState.otherPlayer
+    );
 
     this.tokenBoard.clear();
     this.tokenBoard.draw(
       ...otherXY,
-      this.players[otherPlayerState].token.radius,
-      this.players[otherPlayerState].token.playerColor
+      this.players[animationState.otherPlayer].token.radius,
+      this.players[animationState.otherPlayer].token.playerColor
     );
     this.tokenBoard.draw(
       ...playerXY,
@@ -163,6 +231,7 @@ class SnakesAndLadders {
       playerXY,
       this.getPositionGridReference(player)
     );
+    animationState.xy = nextDrawXY;
     const startPosition = this.getDrawPositionGridReference(player);
     const endPosition = this.getPositionGridReference(player);
     const isDrawXGreaterThanEndX = nextDrawXY[0] >= endPosition[0];
@@ -171,20 +240,14 @@ class SnakesAndLadders {
     const isPortalVertical = startPosition[0] === endPosition[0];
     const isLadder = startPosition[1] < endPosition[1];
     if (nextDrawXY[0] === endPosition[0] && nextDrawXY[1] === endPosition[1]) {
-      this.setDrawPosToPosition(player);
-      this.finishTurn();
-      return;
+      animationState.cleanup = true;
     }
     if (isPortalVertical && isLadder && isDrawYGreaterThanEndY) {
-      this.setDrawPosToPosition(player);
-      this.finishTurn();
-      return;
+      animationState.cleanup = true;
     }
 
     if (isPortalVertical && !isLadder && !isDrawYGreaterThanEndY) {
-      this.setDrawPosToPosition(player);
-      this.finishTurn();
-      return;
+      animationState.cleanup = true;
     }
 
     if (
@@ -193,9 +256,7 @@ class SnakesAndLadders {
       !isDrawXGreaterThanEndX &&
       isDrawYGreaterThanEndY
     ) {
-      this.setDrawPosToPosition(player);
-      this.finishTurn();
-      return;
+      animationState.cleanup = true;
     }
 
     if (
@@ -204,9 +265,7 @@ class SnakesAndLadders {
       isDrawXGreaterThanEndX &&
       isDrawYGreaterThanEndY
     ) {
-      this.setDrawPosToPosition(player);
-      this.finishTurn();
-      return;
+      animationState.cleanup = true;
     }
 
     if (
@@ -215,9 +274,7 @@ class SnakesAndLadders {
       !isDrawXGreaterThanEndX &&
       !isDrawYGreaterThanEndY
     ) {
-      this.setDrawPosToPosition(player);
-      this.finishTurn();
-      return;
+      animationState.cleanup = true;
     }
 
     if (
@@ -226,11 +283,13 @@ class SnakesAndLadders {
       isDrawXGreaterThanEndX &&
       !isDrawYGreaterThanEndY
     ) {
-      this.setDrawPosToPosition(player);
-      this.finishTurn();
-      return;
+      animationState.cleanup = true;
     }
-    window.requestAnimationFrame(() => this.animatePortal(player, nextDrawXY));
+
+    if (animationState.cleanup) {
+      this.setDrawPosToPosition(player);
+    }
+    window.requestAnimationFrame(() => this.animatePortal(animationState));
   }
 
   setDrawPosToPosition(playerState) {
@@ -307,46 +366,66 @@ class SnakesAndLadders {
     if (isSnakePortal) {
       this.players[this.currentPlayer].position +=
         this.gameBoard.snakes[this.players[this.currentPlayer].position];
-      this.animatePortal();
-      return;
+      this.setTurnMessages(this.messages.snake(), true);
+      return true;
     }
     const isLadderPortal =
       this.gameBoard.ladders[this.players[this.currentPlayer].position];
     if (isLadderPortal) {
       this.players[this.currentPlayer].position +=
         this.gameBoard.ladders[this.players[this.currentPlayer].position];
-      this.animatePortal();
-      return;
+      this.setTurnMessages(this.messages.ladder(), true);
+      return true;
     }
-    this.finishTurn();
+    return false;
+    // this.finishTurn();
   }
 
-  play() {
-    if (this.victory) {
-      this.message = `Game over! Player ${this.currentPlayer} has won!`;
-      return;
-    }
+  animationcomplete() {
+    const poll = (resolve) => {
+      if (this.readyToAnimate === true) resolve();
+      else setTimeout(() => poll(resolve), 200);
+    };
 
+    return new Promise(poll);
+  }
+
+  async play() {
+    if (this.victory) {
+      this.setTurnMessages(this.messages.gameOver());
+      return this.turnMessages;
+    }
+    if (!this.readyForNextTurn) {
+      return [];
+    }
+    this.readyForNextTurn = false;
+    this.turnMessages = [];
     this.turnDice = this.rollDice();
     this.diceTotal = this.rollTotal();
     this.setPlayerPosition();
+    this.setTurnMessages(this.messages.move(), true);
     this.animate();
-  }
+    await this.animationcomplete();
+    const isPortal = this.checkPortal();
+    if (isPortal) {
+      this.animatePortal();
+      await this.animationcomplete();
+    }
 
-  finishTurn() {
     this.victory = this.isWon();
-
     if (this.victory) {
-      this.message = `Player ${this.currentPlayer} Wins!`;
-      return;
+      this.setTurnMessages(this.messages.victory());
+      return this.turnMessages;
     }
 
     if (this.isDoubles()) {
       this.samePlayerTurn();
-    } else {
-      this.setCurrentPlayer();
-      this.nextPlayerTurn();
+      this.readyForNextTurn = true;
+      return this.turnMessages;
     }
+    this.setCurrentPlayer();
+    this.readyForNextTurn = true;
+    return this.turnMessages;
   }
 
   init() {
