@@ -1,34 +1,34 @@
 import SnakesAndLadders from "./SnakesAndLadders.js";
 
-// describe("Properties", () => {
-//   beforeEach(() => {
-//     document.body.innerHTML = `<div id="game-container"></div>`;
-//   });
-//   test("Player should get another turn when doubles are rolled", () => {
-//     const game = new SnakesAndLadders();
-//     jest
-//       .spyOn(game, "rollDice")
-//       .mockReturnValueOnce({ die1: 1, die2: 1 })
-//       .mockReturnValueOnce({ die1: 1, die2: 1 })
-//       .mockReturnValueOnce({ die1: 1, die2: 2 })
-//       .mockReturnValueOnce({ die1: 3, die2: 3 })
-//       .mockReturnValueOnce({ die1: 2, die2: 3 });
-//     game.play();
-//     expect(game.isDoubles()).toBe(true);
-//     game.play();
-//     expect(game.isDoubles()).toBe(true);
-//     expect(game.currentPlayer).toBe(1);
-//     game.play();
-//     expect(game.isDoubles()).toBe(false);
-//     expect(game.currentPlayer).toBe(2);
-//     game.play();
-//     expect(game.isDoubles()).toBe(true);
-//     expect(game.currentPlayer).toBe(2);
-//     game.play();
-//     expect(game.isDoubles()).toBe(false);
-//     expect(game.currentPlayer).toBe(1);
-//   });
-// });
+describe("Player should", () => {
+  beforeEach(() => {
+    document.body.innerHTML = `<div id="game-container"></div>`;
+  });
+  test("get another turn when doubles are rolled", async () => {
+    const game = new SnakesAndLadders();
+    jest
+      .spyOn(game, "rollDice")
+      .mockReturnValueOnce({ die1: 1, die2: 1 })
+      .mockReturnValueOnce({ die1: 1, die2: 1 })
+      .mockReturnValueOnce({ die1: 1, die2: 2 })
+      .mockReturnValueOnce({ die1: 3, die2: 3 })
+      .mockReturnValueOnce({ die1: 2, die2: 3 });
+    await game.play();
+    expect(game.isDoubles()).toBe(true);
+    await game.play();
+    expect(game.isDoubles()).toBe(true);
+    expect(game.currentPlayer).toBe(1);
+    await game.play();
+    expect(game.isDoubles()).toBe(false);
+    expect(game.currentPlayer).toBe(2);
+    await game.play();
+    expect(game.isDoubles()).toBe(true);
+    expect(game.currentPlayer).toBe(2);
+    await game.play();
+    expect(game.isDoubles()).toBe(false);
+    expect(game.currentPlayer).toBe(1);
+  });
+});
 
 describe("rollDice method", () => {
   beforeEach(() => {
@@ -115,23 +115,35 @@ describe("turn messages", () => {
   });
 });
 
-// test("too large", () => {
-//   const game = new GameBoard(undefined, 2000);
-//   expect(game.height).toBe(980);
-// });
-// test("too small", () => {
-//   const game = new GameBoard(undefined, 20);
-//   expect(game.height).toBe(250);
-// });
-// test("decimal", () => {
-//   const game = new GameBoard(undefined, 0.8);
-//   expect(game.height).toBe(250);
-// });
-// test("400px", () => {
-//   const game = new GameBoard(undefined, "400px");
-//   expect(game.height).toBe(250);
-// });
-// test("0", () => {
-//   const game = new GameBoard();
-//   expect(game.height).toBe(250);
-// });
+describe("Init", () => {
+  global.innerWidth = 1900;
+  global.innerHeight = 1000;
+
+  test("should create game container", () => {
+    // eslint-disable-next-line no-unused-vars
+    const game = new SnakesAndLadders();
+    const gameContainer = document.getElementById("game-container");
+    expect(gameContainer).toBeTruthy();
+  });
+
+  test("too large", () => {
+    const game = new SnakesAndLadders(null, 2000);
+    expect(game.boardSize).toBe(1000);
+  });
+  test("too small", () => {
+    const game = new SnakesAndLadders(null, 20);
+    expect(game.boardSize).toBe(250);
+  });
+  test("decimal", () => {
+    const game = new SnakesAndLadders(null, 0.8);
+    expect(game.boardSize).toBe(250);
+  });
+  test("400px", () => {
+    const game = new SnakesAndLadders(null, "400px");
+    expect(game.boardSize).toBe(250);
+  });
+  test("0", () => {
+    const game = new SnakesAndLadders();
+    expect(game.boardSize).toBe(800);
+  });
+});
