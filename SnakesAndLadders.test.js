@@ -1,36 +1,36 @@
 import SnakesAndLadders from "./SnakesAndLadders.js";
 
-describe("Properties", () => {
-  beforeEach(() => {
-    document.body.innerHTML = `<div id="game-container"></div>`;
-  });
-  test("Player should get another turn when doubles are rolled", () => {
-    const game = new SnakesAndLadders();
-    jest
-      .spyOn(game, "rollDice")
-      .mockReturnValueOnce({ die1: 1, die2: 1 })
-      .mockReturnValueOnce({ die1: 1, die2: 1 })
-      .mockReturnValueOnce({ die1: 1, die2: 2 })
-      .mockReturnValueOnce({ die1: 3, die2: 3 })
-      .mockReturnValueOnce({ die1: 2, die2: 3 });
-    game.play();
-    expect(game.isDoubles()).toBe(true);
-    game.play();
-    expect(game.isDoubles()).toBe(true);
-    expect(game.currentPlayer).toBe(1);
-    game.play();
-    expect(game.isDoubles()).toBe(false);
-    expect(game.currentPlayer).toBe(2);
-    game.play();
-    expect(game.isDoubles()).toBe(true);
-    expect(game.currentPlayer).toBe(2);
-    game.play();
-    expect(game.isDoubles()).toBe(false);
-    expect(game.currentPlayer).toBe(1);
-  });
-});
+// describe("Properties", () => {
+//   beforeEach(() => {
+//     document.body.innerHTML = `<div id="game-container"></div>`;
+//   });
+//   test("Player should get another turn when doubles are rolled", () => {
+//     const game = new SnakesAndLadders();
+//     jest
+//       .spyOn(game, "rollDice")
+//       .mockReturnValueOnce({ die1: 1, die2: 1 })
+//       .mockReturnValueOnce({ die1: 1, die2: 1 })
+//       .mockReturnValueOnce({ die1: 1, die2: 2 })
+//       .mockReturnValueOnce({ die1: 3, die2: 3 })
+//       .mockReturnValueOnce({ die1: 2, die2: 3 });
+//     game.play();
+//     expect(game.isDoubles()).toBe(true);
+//     game.play();
+//     expect(game.isDoubles()).toBe(true);
+//     expect(game.currentPlayer).toBe(1);
+//     game.play();
+//     expect(game.isDoubles()).toBe(false);
+//     expect(game.currentPlayer).toBe(2);
+//     game.play();
+//     expect(game.isDoubles()).toBe(true);
+//     expect(game.currentPlayer).toBe(2);
+//     game.play();
+//     expect(game.isDoubles()).toBe(false);
+//     expect(game.currentPlayer).toBe(1);
+//   });
+// });
 
-describe("method roll dice", () => {
+describe("rollDice method", () => {
   beforeEach(() => {
     document.body.innerHTML = `<div id="game-container"></div>`;
   });
@@ -56,55 +56,62 @@ describe("method roll dice", () => {
   });
 });
 
-// Fails because portals disabled
-describe("incomplete four dice roll game", () => {
+describe("turn messages", () => {
   beforeEach(() => {
     document.body.innerHTML = `<div id="game-container"></div>`;
   });
 
-  test("it should create new game board and roll dice four times", () => {
+  test("should be an array", () => {
     const game = new SnakesAndLadders();
-
-    jest
-      .spyOn(game, "rollDice")
-      .mockReturnValueOnce({ die1: 1, die2: 1 })
-      .mockReturnValueOnce({ die1: 1, die2: 5 })
-      .mockReturnValueOnce({ die1: 6, die2: 2 })
-      .mockReturnValueOnce({ die1: 1, die2: 1 });
-
     game.play();
-    expect(game.message).toBe("Player 1 is on square 38");
-    game.play();
-    expect(game.message).toBe("Player 1 is on square 44");
-    game.play();
-    expect(game.message).toBe("Player 2 is on square 31");
-    game.play();
-    expect(game.message).toBe("Player 1 is on square 25");
-  });
-});
-
-describe("Game ending", () => {
-  beforeEach(() => {
-    document.body.innerHTML = `<div id="game-container"></div>`;
+    expect(Array.isArray(game.turnMessages)).toBeTruthy();
   });
 
-  test("should declare a winner", () => {
+  test("should show only victory message", () => {
     const game = new SnakesAndLadders();
-    game.players[1].position = 98;
+    game.victory = true;
+    game.play();
+    expect(game.turnMessages).toHaveLength(1);
+  });
+
+  test("should have message and playerColor keys", () => {
+    const game = new SnakesAndLadders();
+    game.victory = true;
+    game.play();
+    expect(game.turnMessages[0]).toHaveProperty("message");
+    expect(game.turnMessages[0]).toHaveProperty("playerColor");
+  });
+
+  test("playerColor should not be defined", () => {
+    const game = new SnakesAndLadders();
+    game.victory = true;
+
+    game.play();
+    expect(game.turnMessages[0].playerColor).toBeFalsy();
+  });
+
+  test("player1 playerColor should be a color string", () => {
+    const game = new SnakesAndLadders();
+    game.play();
+    expect(game.turnMessages[0].playerColor).toMatch(/#FE7E6D/);
+  });
+
+  test("should show the correct player and square", () => {
+    const game = new SnakesAndLadders();
+    jest.spyOn(game, "rollDice").mockReturnValueOnce({ die1: 1, die2: 5 });
+    game.play();
+    expect(game.turnMessages[0].message).toBe("Player 1 is on square 6");
+  });
+
+  test("should be a doubles message with color undefined", async () => {
+    const game = new SnakesAndLadders();
     jest.spyOn(game, "rollDice").mockReturnValueOnce({ die1: 1, die2: 1 });
-    game.play();
-    expect(game.message).not.toBe("Player 2 Wins!");
-    expect(game.message).toBe("Player 1 Wins!");
-  });
-  test("should declare game over", () => {
-    const game = new SnakesAndLadders();
-    game.players[1].position = 98;
-    jest.spyOn(game, "rollDice").mockReturnValueOnce({ die1: 1, die2: 1 });
-    game.play();
-    game.play();
-    expect(game.message).not.toBe("Player 1 Wins!");
-    expect(game.message).not.toBe("Game over! Player 2 has won!");
-    expect(game.message).toBe("Game over! Player 1 has won!");
+    const turnMessages = await game.play();
+    expect(turnMessages).toHaveLength(3);
+    expect(turnMessages[2].message).toMatch(
+      /Player 1 rolled doubles and gets to roll again/
+    );
+    expect(turnMessages[2].playerColor).toBeFalsy();
   });
 });
 

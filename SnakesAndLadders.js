@@ -41,7 +41,6 @@ class SnakesAndLadders {
   messages = {
     samePlayerTurn: () =>
       `Player ${this.currentPlayer} rolled doubles and gets to roll again`,
-    // nextPlayerTurn: () => `Player ${this.currentPlayer} rolled doubles and gets to roll again`,
     move: () =>
       `Player ${this.currentPlayer} is on square ${
         this.players[this.currentPlayer].position
