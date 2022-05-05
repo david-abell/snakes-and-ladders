@@ -44,6 +44,7 @@ It should have:
 - Player token movement was extremely complicated until I pregenerated coordinates and just drew array indexes.
 - Separation of methods into correct place. Initially built draw methods into a player token class, duplicating methods with each instance and requiring to many variables getting passed back and forth.
 - Draw animations were too complicated until I stopped trying to clear portions of the board and did full wipe and redraws.
+- Spent far too long bugfixing `requestAnimationFrame()` causing separate move animations to overlap. Promisifying everthing didn't help. Ended up with a simple boolean variable check using setTimout and a promise to wait for animations to report themselves done.
 
 ## Available scripts
 
