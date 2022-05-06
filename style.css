@@ -141,11 +141,15 @@ button {
   border-radius: 0.5rem;
 }
 
+.message-container {
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
 .messages {
   background-color: #f9fafb;
   margin: 0;
   padding: 1em;
-  border-radius: 0.5rem;
   width: 250px;
   height: 600px;
   word-wrap: break-word;
