@@ -4,7 +4,8 @@
   "description": "",
   "default": "game.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "testupdate": "jest --updateSnapshot"
   },
   "author": "",
   "license": "ISC",

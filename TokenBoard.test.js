@@ -4,7 +4,7 @@ describe("drawGrid", () => {
   test("", () => {});
 });
 
-describe("setup", () => {
+describe("init", () => {
   beforeEach(() => {
     document.body.innerHTML = `<div id="game-container"></div>`;
   });
@@ -33,8 +33,26 @@ describe("setup", () => {
     const gameBoard = document.getElementById("token-board");
     expect(gameBoard).toBeTruthy();
   });
-
-  // test should create context
 });
 
-// Test methods
+describe("draw", () => {
+  let containerEl;
+  let game;
+  beforeEach(() => {
+    containerEl = document.createElement("div");
+    game = new TokenBoard(containerEl, 800);
+  });
+
+  test(`should return the player token`, () => {
+    const playerToken = game.draw(15, 15, 15, "#FE7E6D");
+    expect(playerToken instanceof Path2D).toBeTruthy();
+  });
+
+  test(`should draw a player token on the board context`, () => {
+    // eslint-disable-next-line no-unused-vars
+    const playerToken = game.draw(15, 10, 15, "#FE7E6D");
+    // eslint-disable-next-line no-underscore-dangle
+    const events = game.context.__getEvents();
+    expect(events).toMatchSnapshot();
+  });
+});
