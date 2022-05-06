@@ -32,6 +32,7 @@ class TokenBoard {
     this.context.fillStyle = fillStyle;
     this.context.beginPath();
     this.context.fill(circle);
+    return circle;
   }
 
   clear() {
