@@ -50,7 +50,10 @@ It should have:
 
 ```bash
 npm test
+npm run testupdate
 ```
+
+`testupdate` resets snapshots for canvas draw testing
 
 ## Credits
 
