@@ -4,7 +4,6 @@ class PlayerToken {
   constructor(playerNumber) {
     this.playerNumber = playerNumber;
     this.playerColor = this.setPlayerColor();
-    this.radius = 15;
   }
 
   setPlayerColor() {

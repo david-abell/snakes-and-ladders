@@ -10,6 +10,8 @@ import TokenBoard from "./TokenBoard.js";
 class SnakesAndLadders {
   tokenBoard;
 
+  tokenRadius;
+
   gameBoard;
 
   victory = false;
@@ -81,6 +83,10 @@ class SnakesAndLadders {
     this.boardSize = result;
   }
 
+  setTokenRadius() {
+    this.tokenRadius = Math.floor(this.boardSize / 45);
+  }
+
   setContainerEl() {
     if (!this.containerEl) {
       const newDiv = document.createElement("div");
@@ -144,20 +150,18 @@ class SnakesAndLadders {
     const player = animationState.player || this.currentPlayer;
     animationState.otherPlayer = animationState.otherPlayer || this.otherPlayer;
 
-    const playerXY = this.getDrawPositionGridReference(player);
-    const otherXY = this.getDrawPositionGridReference(
-      animationState.otherPlayer
-    );
+    const playerXY = this.getDrawOffsetGridReference(player);
+    const otherXY = this.getDrawOffsetGridReference(animationState.otherPlayer);
 
     this.tokenBoard.clear();
     this.tokenBoard.draw(
       ...otherXY,
-      this.players[animationState.otherPlayer].token.radius,
+      this.tokenRadius,
       this.players[animationState.otherPlayer].token.playerColor
     );
     this.tokenBoard.draw(
       ...playerXY,
-      this.players[player].token.radius,
+      this.tokenRadius,
       this.players[player].token.playerColor
     );
 
@@ -210,31 +214,29 @@ class SnakesAndLadders {
     animationState.otherPlayer = animationState.otherPlayer || this.otherPlayer;
     const player = animationState.player || this.currentPlayer;
     animationState.xy =
-      animationState.xy || this.getDrawPositionGridReference(player);
+      animationState.xy || this.getDrawOffsetGridReference(player);
 
     const playerXY = animationState.xy;
-    const otherXY = this.getDrawPositionGridReference(
-      animationState.otherPlayer
-    );
+    const otherXY = this.getDrawOffsetGridReference(animationState.otherPlayer);
 
     this.tokenBoard.clear();
     this.tokenBoard.draw(
       ...otherXY,
-      this.players[animationState.otherPlayer].token.radius,
+      this.tokenRadius,
       this.players[animationState.otherPlayer].token.playerColor
     );
     this.tokenBoard.draw(
       ...playerXY,
-      this.players[player].token.radius,
+      this.tokenRadius,
       this.players[player].token.playerColor
     );
     const nextDrawXY = this.getNextDrawPoint(
       playerXY,
-      this.getPositionGridReference(player)
+      this.getOffsetGridReference(player)
     );
     animationState.xy = nextDrawXY;
-    const startPosition = this.getDrawPositionGridReference(player);
-    const endPosition = this.getPositionGridReference(player);
+    const startPosition = this.getDrawOffsetGridReference(player);
+    const endPosition = this.getOffsetGridReference(player);
     const isDrawXGreaterThanEndX = nextDrawXY[0] >= endPosition[0];
     const isDrawYGreaterThanEndY = nextDrawXY[1] >= endPosition[1];
     const doesPortalGoLeft = startPosition[0] > endPosition[0];
@@ -335,30 +337,50 @@ class SnakesAndLadders {
     return [newX, newY];
   }
 
-  getDrawPositionGridReference(playerState) {
-    if (playerState) {
-      return (
-        this.gridReference[this.players[playerState].drawPos - 1] ||
-        this.gridReference[0]
-      );
-    }
-    return (
-      this.gridReference[this.players[this.currentPlayer].drawPos - 1] ||
-      this.gridReference[0]
-    );
+  // getDrawPositionGridReference(player) {
+  //   if (player) {
+  //     return (
+  //       this.gridReference[this.players[player].drawPos - 1] ||
+  //       this.gridReference[0]
+  //     );
+  //   }
+  //   return (
+  //     this.gridReference[this.players[this.currentPlayer].drawPos - 1] ||
+  //     this.gridReference[0]
+  //   );
+  // }
+
+  // getPositionGridReference(player) {
+  //   if (player) {
+  //     return (
+  //       this.gridReference[this.players[player].position - 1] ||
+  //       this.gridReference[0]
+  //     );
+  //   }
+  //   return (
+  //     this.gridReference[this.players[this.currentPlayer].position - 1] ||
+  //     this.gridReference[0]
+  //   );
+  // }
+
+  getDrawOffsetGridReference(player) {
+    const position = this.players[player].drawPos
+      ? this.players[player].drawPos - 1
+      : 0;
+    const radiusOffset =
+      player === 1 ? this.tokenRadius : this.tokenRadius * -1;
+    const x = this.gridReference[position][0];
+    const y = this.gridReference[position][1];
+    return [x + radiusOffset, y + radiusOffset];
   }
 
-  getPositionGridReference(playerState) {
-    if (playerState) {
-      return (
-        this.gridReference[this.players[playerState].position - 1] ||
-        this.gridReference[0]
-      );
-    }
-    return (
-      this.gridReference[this.players[this.currentPlayer].position - 1] ||
-      this.gridReference[0]
-    );
+  getOffsetGridReference(player) {
+    const position = this.players[player].position - 1;
+    const radiusOffset =
+      player === 1 ? this.tokenRadius : this.tokenRadius * -1;
+    const x = this.gridReference[position][0];
+    const y = this.gridReference[position][1];
+    return [x + radiusOffset, y + radiusOffset];
   }
 
   checkPortal() {
@@ -432,6 +454,7 @@ class SnakesAndLadders {
   init() {
     this.setContainerEl();
     this.setBoardSize();
+    this.setTokenRadius();
     this.gameBoard = new GameBoard(this.containerEl, this.boardSize);
     this.tokenBoard = new TokenBoard(this.containerEl, this.boardSize);
     this.gridReference = this.gameBoard.gridReference;
