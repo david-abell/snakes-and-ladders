@@ -18,7 +18,7 @@ class TokenBoard {
     if (!document.getElementById("token-board")) {
       const canvas = document.createElement("canvas");
       canvas.setAttribute("id", "token-board");
-      document.getElementById("game-container").appendChild(canvas);
+      document.getElementById("board-container").appendChild(canvas);
     }
     this.canvas = document.getElementById("token-board");
     this.canvas.width = this.boardSize;

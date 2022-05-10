@@ -75,12 +75,12 @@ select {
 }
 
 body {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  padding-block: 2rem;
+  display: block;
   background-color: #343c47;
+  max-width: 80vw;
+  margin: auto;
+  text-align: center;
 }
 
 h1,
@@ -104,7 +104,7 @@ button {
 }
 
 h1 {
-  margin-block: 1rem;
+  margin-block-end: 1rem;
 }
 
 button {
@@ -118,11 +118,11 @@ button {
 .grid-container {
   display: grid;
   grid-template-columns: auto 1fr;
-  margin-block-end: 1em;
   gap: 1em;
+  margin-block-end: 2rem;
 }
 
-.game-container {
+.board-container {
   position: relative;
 }
 
@@ -150,12 +150,12 @@ button {
   background-color: #f9fafb;
   margin: 0;
   padding: 1em;
-  width: 250px;
-  height: 600px;
   word-wrap: break-word;
   overflow: auto;
   display: flex;
   flex-direction: column;
+  min-width: 18.75rem;
+  text-align: left;
 }
 
 .messages li {

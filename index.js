@@ -4,7 +4,7 @@ import SnakesAndLadders from "./SnakesAndLadders.js";
 // import { debounce } from "./helpers.js";
 
 // const gridContainer = document.getElementById("grid-container");
-const gameBoards = document.getElementById("game-container");
+const gameBoards = document.getElementById("board-container");
 const messages = document.querySelector("#messages");
 const game = new SnakesAndLadders(gameBoards, messages, 1000);
 

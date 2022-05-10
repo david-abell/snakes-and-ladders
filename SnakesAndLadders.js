@@ -93,8 +93,8 @@ class SnakesAndLadders {
   setContainerEl() {
     if (!this.containerEl) {
       const newDiv = document.createElement("div");
-      newDiv.setAttribute("id", "game-container");
-      newDiv.classList.add("game-container");
+      newDiv.setAttribute("id", "board-container");
+      newDiv.classList.add("board-container");
       this.containerEl = newDiv;
       document.body.appendChild(newDiv);
     }

@@ -1,17 +1,17 @@
 import Messages from "./Messages.js";
 import SnakesAndLadders from "./SnakesAndLadders.js";
 
-let gameContainer;
+let boardContainer;
 let messageContainer;
 
 describe("Player should", () => {
   beforeEach(() => {
-    document.body.innerHTML = `<div id="game-container"></div><div id="message-container"><ol role="list" id="messages" class="messages"><li><b>Click play to start a new game</b></li></ol></div>`;
-    gameContainer = document.getElementById("game-container");
+    document.body.innerHTML = `<div id="board-container"></div><div id="message-container"><ol role="list" id="messages" class="messages"><li><b>Click play to start a new game</b></li></ol></div>`;
+    boardContainer = document.getElementById("board-container");
     messageContainer = document.getElementById("message-container");
   });
   test("get another turn when doubles are rolled", async () => {
-    const game = new SnakesAndLadders(gameContainer, messageContainer);
+    const game = new SnakesAndLadders(boardContainer, messageContainer);
     jest
       .spyOn(game, "rollDice")
       .mockReturnValueOnce({ die1: 1, die2: 1 })
@@ -39,18 +39,18 @@ describe("Player should", () => {
 describe("rollDice method", () => {
   beforeEach(() => {
     document.body.innerHTML = `
-    <div id="game-container"></div>
+    <div id="board-container"></div>
     <div id="message-container">
       <ol role="list" id="messages" class="messages">
         <li><b>Click play to start a new game</b></li>
       </ol>
     </div>`;
-    gameContainer = document.getElementById("game-container");
+    boardContainer = document.getElementById("board-container");
     messageContainer = document.getElementById("message-container");
   });
 
   test("should return two dice with number values", () => {
-    const game = new SnakesAndLadders(gameContainer, messageContainer);
+    const game = new SnakesAndLadders(boardContainer, messageContainer);
     const value = game.rollDice();
     expect(value).toEqual(
       expect.objectContaining({
@@ -61,7 +61,7 @@ describe("rollDice method", () => {
   });
 
   test("should be numbers from 1 to 6", () => {
-    const game = new SnakesAndLadders(gameContainer, messageContainer);
+    const game = new SnakesAndLadders(boardContainer, messageContainer);
     const value = game.rollDice();
     expect(value.die1).toBeGreaterThanOrEqual(1);
     expect(value.die1).toBeLessThanOrEqual(6);
@@ -73,23 +73,23 @@ describe("rollDice method", () => {
 describe("messages", () => {
   beforeEach(() => {
     document.body.innerHTML = `
-    <div id="game-container"></div>
+    <div id="board-container"></div>
     <div id="message-container">
       <ol role="list" id="messages" class="messages">
         <li><b>Click play to start a new game</b></li>
       </ol>
     </div>`;
-    gameContainer = document.getElementById("game-container");
+    boardContainer = document.getElementById("board-container");
     messageContainer = document.getElementById("message-container");
   });
 
   test("should be a message instance", () => {
-    const game = new SnakesAndLadders(gameContainer, messageContainer);
+    const game = new SnakesAndLadders(boardContainer, messageContainer);
     expect(game.messages).toBeInstanceOf(Messages);
   });
 
   test("should show the correct player and square", async () => {
-    const game = new SnakesAndLadders(gameContainer, messageContainer);
+    const game = new SnakesAndLadders(boardContainer, messageContainer);
     jest.spyOn(game, "rollDice").mockReturnValueOnce({ die1: 1, die2: 5 });
     await game.play();
     expect(document.querySelector("li:last-child").innerHTML).toMatch(
@@ -101,7 +101,7 @@ describe("messages", () => {
   });
 
   test("should be a doubles message with color undefined", async () => {
-    const game = new SnakesAndLadders(gameContainer, messageContainer);
+    const game = new SnakesAndLadders(boardContainer, messageContainer);
     jest.spyOn(game, "rollDice").mockReturnValueOnce({ die1: 2, die2: 2 });
     await game.play();
     expect(game.messages.messageList).toHaveLength(3);
@@ -117,43 +117,47 @@ describe("Init", () => {
   global.innerHeight = 1080;
   beforeEach(() => {
     document.body.innerHTML = `
-    <div id="game-container"></div>
+    <div id="board-container"></div>
     <div id="message-container">
       <ol role="list" id="messages" class="messages">
         <li><b>Click play to start a new game</b></li>
       </ol>
     </div>`;
-    gameContainer = document.getElementById("game-container");
+    boardContainer = document.getElementById("board-container");
     messageContainer = document.getElementById("message-container");
   });
 
   test("should create game container", () => {
-    document.getElementById("game-container").remove();
-    gameContainer = null;
+    document.getElementById("board-container").remove();
+    boardContainer = null;
     // eslint-disable-next-line no-unused-vars
-    const game = new SnakesAndLadders(gameContainer, messageContainer);
-    gameContainer = document.getElementById("game-container");
-    expect(gameContainer).toBeTruthy();
+    const game = new SnakesAndLadders(boardContainer, messageContainer);
+    boardContainer = document.getElementById("board-container");
+    expect(boardContainer).toBeTruthy();
   });
 
   test("too large", () => {
-    const game = new SnakesAndLadders(gameContainer, messageContainer, 1200);
+    const game = new SnakesAndLadders(boardContainer, messageContainer, 1200);
     expect(game.boardSize).toBe(1000);
   });
   test("too small", () => {
-    const game = new SnakesAndLadders(gameContainer, messageContainer, 20);
+    const game = new SnakesAndLadders(boardContainer, messageContainer, 20);
     expect(game.boardSize).toBe(250);
   });
   test("decimal", () => {
-    const game = new SnakesAndLadders(gameContainer, messageContainer, 0.8);
+    const game = new SnakesAndLadders(boardContainer, messageContainer, 0.8);
     expect(game.boardSize).toBe(250);
   });
   test("400px", () => {
-    const game = new SnakesAndLadders(gameContainer, messageContainer, "400px");
+    const game = new SnakesAndLadders(
+      boardContainer,
+      messageContainer,
+      "400px"
+    );
     expect(game.boardSize).toBe(250);
   });
   test("0", () => {
-    const game = new SnakesAndLadders(gameContainer, messageContainer);
+    const game = new SnakesAndLadders(boardContainer, messageContainer);
     expect(game.boardSize).toBe(800);
   });
 });
