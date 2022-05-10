@@ -155,7 +155,7 @@ button {
   word-wrap: break-word;
   overflow: auto;
   display: flex;
-  flex-direction: column-reverse;
+  flex-direction: column;
 }
 
 .messages li {
@@ -163,6 +163,9 @@ button {
   color: #343c47;
   padding-block: 0.5em;
   border-bottom: 1px dotted #343c47;
-
   /* margin-inline-start: 16px; */
+}
+
+.messages li:last-child {
+  scroll-snap-align: end;
 }

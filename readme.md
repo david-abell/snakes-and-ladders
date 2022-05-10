@@ -45,6 +45,7 @@ It should have:
 - Separation of methods into correct place. Initially built draw methods into a player token class, duplicating methods with each instance and requiring to many variables getting passed back and forth.
 - Draw animations were too complicated until I stopped trying to clear portions of the board and did full wipe and redraws.
 - Spent far too long bugfixing `requestAnimationFrame()` causing separate move animations to overlap. Promisifying everthing didn't help. Ended up with a simple boolean variable check using setTimout and a promise to wait for animations to report themselves done.
+- Wrote a nice messaging class and set the default start message to be first `<li>.innerText`. Turns out jest and jsdom don't support innerText and the issue open for it is six years old and not yet resolved...[Jest Issue #1245](https://github.com/jsdom/jsdom/issues/1245). Replaced with Happy-dom.
 
 ## Available scripts
 

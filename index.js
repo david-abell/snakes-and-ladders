@@ -1,20 +1,22 @@
 "use-strict";
 
 import SnakesAndLadders from "./SnakesAndLadders.js";
+// import { debounce } from "./helpers.js";
 
+// const gridContainer = document.getElementById("grid-container");
 const gameBoards = document.getElementById("game-container");
-const game = new SnakesAndLadders(gameBoards, 600);
+const messages = document.querySelector("#messages");
+const game = new SnakesAndLadders(gameBoards, messages, 1000);
 
 const playButton = document.querySelector("#play-turn");
-const messages = document.querySelector("#messages");
 
-playButton.addEventListener("click", async () => {
-  const turnResult = await game.play();
-  turnResult.forEach((el) => {
-    const { message, playerColor } = el;
-    const newMessage = document.createElement("li");
-    newMessage.style.color = playerColor;
-    newMessage.innerText = message;
-    messages.prepend(newMessage);
-  });
+// window.addEventListener(
+//   "resize",
+//   debounce(() => {
+//     game.init;
+//   })
+// );
+
+playButton.addEventListener("click", () => {
+  game.play();
 });
