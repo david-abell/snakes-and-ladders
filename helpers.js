@@ -10,4 +10,19 @@ function getIntercept(x1, y1, slope) {
   return y1 - slope * x1;
 }
 
-export { getRandomDie, getSlope, getIntercept };
+function debounce(func, delay = 200) {
+  let timeoutId;
+  const context = this;
+  return (...args) => {
+    // cancel the previous timer
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+    // setup a new timer
+    timeoutId = setTimeout(() => {
+      func.apply(context, ...args);
+    }, delay);
+  };
+}
+
+export { getRandomDie, getSlope, getIntercept, debounce };

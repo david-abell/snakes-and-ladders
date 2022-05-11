@@ -2,19 +2,12 @@
 
 import SnakesAndLadders from "./SnakesAndLadders.js";
 
-const gameBoards = document.getElementById("game-container");
-const game = new SnakesAndLadders(gameBoards, 600);
-
-const playButton = document.querySelector("#play-turn");
+const gameBoards = document.getElementById("board-container");
 const messages = document.querySelector("#messages");
+const game = new SnakesAndLadders(gameBoards, messages, 1000);
 
-playButton.addEventListener("click", async () => {
-  const turnResult = await game.play();
-  turnResult.forEach((el) => {
-    const { message, playerColor } = el;
-    const newMessage = document.createElement("li");
-    newMessage.style.color = playerColor;
-    newMessage.innerText = message;
-    messages.prepend(newMessage);
-  });
+const playButton = document.querySelector("#play-button");
+
+playButton.addEventListener("click", () => {
+  game.play();
 });

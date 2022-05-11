@@ -6,11 +6,11 @@ describe("drawGrid", () => {
 
 describe("init", () => {
   beforeEach(() => {
-    document.body.innerHTML = `<div id="game-container"></div>`;
+    document.body.innerHTML = `<div id="board-container"></div>`;
   });
 
   test("throw an error if size parameter missing", () => {
-    const containerEl = document.getElementById("game-container");
+    const containerEl = document.getElementById("board-container");
     const boardConstructor = () => {
       // eslint-disable-next-line no-new
       new TokenBoard(containerEl);
@@ -26,8 +26,8 @@ describe("init", () => {
     expect(boardConstructor).toThrowError(/Missing container el/);
   });
 
-  test("should create canvas element in game-container", () => {
-    const containerEl = document.getElementById("game-container");
+  test("should create canvas element in board-container", () => {
+    const containerEl = document.getElementById("board-container");
     // eslint-disable-next-line no-unused-vars
     const game = new TokenBoard(containerEl, 800);
     const gameBoard = document.getElementById("token-board");

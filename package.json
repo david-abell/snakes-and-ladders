@@ -13,6 +13,7 @@
     "@babel/core": "^7.17.9",
     "@babel/plugin-transform-runtime": "^7.17.10",
     "@babel/preset-env": "^7.16.11",
+    "@happy-dom/jest-environment": "^3.1.1",
     "@types/jest": "^27.4.1",
     "canvas": "^2.9.1",
     "eslint": "^8.12.0",
@@ -29,6 +30,6 @@
     "setupFiles": [
       "jest-canvas-mock"
     ],
-    "testEnvironment": "jsdom"
+    "testEnvironment": "@happy-dom/jest-environment"
   }
 }

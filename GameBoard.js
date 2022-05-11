@@ -48,7 +48,7 @@ class GameBoard {
     if (!document.getElementById("game-board")) {
       const canvas = document.createElement("canvas");
       canvas.setAttribute("id", "game-board");
-      document.getElementById("game-container").appendChild(canvas);
+      this.containerEl.appendChild(canvas);
     }
     this.canvas = document.getElementById("game-board");
     this.canvas.width = this.boardSize;

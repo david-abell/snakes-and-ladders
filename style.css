@@ -75,12 +75,12 @@ select {
 }
 
 body {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  padding-block: 1rem;
+  padding-inline: 1rem;
+  display: block;
   background-color: #343c47;
+  margin: auto;
+  text-align: center;
 }
 
 h1,
@@ -103,27 +103,28 @@ button {
   color: #f9fafb;
 }
 
-h1 {
-  margin-block: 1rem;
-}
-
-button {
-  border-radius: 0.5rem;
-  padding-block: 0.5rem;
-  padding-inline: 2rem;
-  color: #343c47;
-  font-weight: 700;
-}
-
 .grid-container {
   display: grid;
-  grid-template-columns: auto 1fr;
-  margin-block-end: 1em;
-  gap: 1em;
+  justify-content: center;
+  justify-items: stretch;
+  align-content: start;
+  grid-template-rows: repeat(4, auto);
+  grid-auto-columns: minmax(0, auto);
+  grid-template-areas:
+    "header"
+    "boards"
+    "playButton"
+    "messages";
+  gap: 1rem;
 }
 
-.game-container {
+.header {
+  grid-area: header;
+}
+
+.board-container {
   position: relative;
+  grid-area: boards;
 }
 
 #game-board {
@@ -134,7 +135,6 @@ button {
 
 #token-board {
   position: absolute;
-  display: block;
   top: 0;
   left: 0;
   z-index: 100;
@@ -143,26 +143,68 @@ button {
 
 .message-container {
   border-radius: 0.5rem;
-  overflow: hidden;
+  min-width: 18.125rem;
+  overflow-y: hidden;
+  grid-area: messages;
 }
 
 .messages {
   background-color: #f9fafb;
   margin: 0;
-  padding: 1em;
-  width: 250px;
-  height: 600px;
+  padding: 1rem;
   word-wrap: break-word;
-  overflow: auto;
+  overflow-y: auto;
   display: flex;
   flex-direction: column-reverse;
+  text-align: left;
+  max-height: 16rem;
 }
 
 .messages li {
   font-family: "Lato", sans-serif;
   color: #343c47;
-  padding-block: 0.5em;
-  border-bottom: 1px dotted #343c47;
-
+  padding-block: 0.5rem;
   /* margin-inline-start: 16px; */
+}
+
+.messages li:not(:last-child) {
+  border-bottom: 1px dotted #343c47;
+}
+
+.messages li:last-child {
+  scroll-snap-align: end;
+}
+
+.play-button {
+  border-radius: 0.5rem;
+  padding-block: 0.5rem;
+  padding-inline: 2rem;
+  color: #343c47;
+  font-weight: 700;
+  max-height: 4rem;
+  grid-area: playButton;
+}
+
+@media (min-width: 1200px) {
+  .grid-container {
+    grid-template-rows: repeat(3, auto);
+    grid-template-columns: auto 0.5fr;
+    grid-template-areas:
+      "header header"
+      "boards messages"
+      "playButton playButton";
+    max-width: 100rem;
+    margin-inline: auto;
+  }
+
+  .messages {
+    max-height: 100%;
+    flex-direction: column;
+  }
+}
+
+@media (min-width: 1368px) {
+  body {
+    padding-block: 2rem;
+  }
 }

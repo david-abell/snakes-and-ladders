@@ -2,10 +2,11 @@
 
 "use-strict";
 
-import { getRandomDie, getSlope, getIntercept } from "./helpers.js";
+import { getRandomDie, getSlope, getIntercept, debounce } from "./helpers.js";
 import GameBoard from "./GameBoard.js";
 import PlayerToken from "./PlayerToken.js";
 import TokenBoard from "./TokenBoard.js";
+import Messages from "./Messages.js";
 
 class SnakesAndLadders {
   tokenBoard;
@@ -13,6 +14,8 @@ class SnakesAndLadders {
   tokenRadius;
 
   gameBoard;
+
+  boardSize;
 
   victory = false;
 
@@ -39,9 +42,7 @@ class SnakesAndLadders {
 
   diceTotal = null;
 
-  message = "";
-
-  messages = {
+  messageOptions = {
     samePlayerTurn: () =>
       `Player ${this.currentPlayer} rolled doubles and gets to roll again`,
     move: () =>
@@ -61,43 +62,66 @@ class SnakesAndLadders {
       `Game over! Player ${this.currentPlayer} has won in ${this.turnTotal} turns`,
   };
 
-  turnMessages = [];
-
   gridReference;
 
   readyToAnimate = true;
 
   readyForNextTurn = true;
 
-  constructor(containerEl, size = 800) {
-    this.boardSize = size;
-    this.containerEl = containerEl;
+  constructor(boardEl, messagesEl, size = 800) {
+    this.requestedSize = size;
+    this.boardEl = boardEl;
+    this.messagesEl = messagesEl;
+    this.messages = new Messages(messagesEl);
+    window.addEventListener("resize", debounce(this.init.bind(this), 50));
     this.init();
   }
 
   setBoardSize() {
-    const isInputInteger = Number.isInteger(this.boardSize);
-    const requestedSize = isInputInteger ? Math.max(this.boardSize, 250) : 250;
-    const maxBoardSize = Math.min(window.innerHeight, window.innerWidth);
-    const result = requestedSize < maxBoardSize ? requestedSize : maxBoardSize;
-    this.boardSize = result;
+    const shortestWindowLength = Math.floor(
+      Math.min(window.innerHeight * 0.78, window.innerWidth * 0.78)
+    );
+    const maxLargeLayoutCanvasSize =
+      Math.floor(Math.min(this.requestedSize, shortestWindowLength)) ||
+      shortestWindowLength;
+    const parentWidth = Math.floor(this.boardEl.parentElement.offsetWidth);
+    const isNarrowScreen = window.innerWidth < 1200;
+    if (!isNarrowScreen) {
+      this.boardSize =
+        parentWidth > maxLargeLayoutCanvasSize
+          ? maxLargeLayoutCanvasSize
+          : parentWidth - 320;
+    }
+    if (isNarrowScreen) {
+      this.boardSize = parentWidth;
+    }
   }
 
   setTokenRadius() {
     this.tokenRadius = Math.floor(this.boardSize / 45);
   }
 
-  setContainerEl() {
-    if (!this.containerEl) {
-      const newDiv = document.createElement("div");
-      newDiv.setAttribute("id", "game-container");
-      newDiv.classList.add("game-container");
-      this.containerEl = newDiv;
+  setboardEl() {
+    if (document.getElementById("board-container") || this.boardEl) {
+      return;
+    }
+    const gridContainer = document.getElementById("grid-container");
+    const newDiv = document.createElement("div");
+    newDiv.setAttribute("id", "board-container");
+    newDiv.classList.add("board-container");
+    this.boardEl = newDiv;
+    if (gridContainer) {
+      gridContainer.appendChild(newDiv);
+    } else {
       document.body.appendChild(newDiv);
     }
   }
 
-  setTurnMessages(message, isPlayer) {
+  setMessageElHeight() {
+    this.messagesEl.style.height = `${this.boardSize}px`;
+  }
+
+  setmessages(message, isPlayer) {
     const playerColor = isPlayer
       ? this.players[this.currentPlayer].token.playerColor
       : false;
@@ -105,7 +129,7 @@ class SnakesAndLadders {
       message,
       playerColor,
     };
-    this.turnMessages.push(result);
+    this.messages.add(result);
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -129,11 +153,11 @@ class SnakesAndLadders {
   }
 
   samePlayerTurn() {
-    this.setTurnMessages(this.messages.samePlayerTurn());
+    this.setmessages(this.messageOptions.samePlayerTurn());
   }
 
   nextPlayerTurn() {
-    this.setTurnMessages(this.messages.nextPlayerTurn());
+    this.setmessages(this.messageOptions.nextPlayerTurn());
   }
 
   isWon() {
@@ -337,32 +361,6 @@ class SnakesAndLadders {
     return [newX, newY];
   }
 
-  // getDrawPositionGridReference(player) {
-  //   if (player) {
-  //     return (
-  //       this.gridReference[this.players[player].drawPos - 1] ||
-  //       this.gridReference[0]
-  //     );
-  //   }
-  //   return (
-  //     this.gridReference[this.players[this.currentPlayer].drawPos - 1] ||
-  //     this.gridReference[0]
-  //   );
-  // }
-
-  // getPositionGridReference(player) {
-  //   if (player) {
-  //     return (
-  //       this.gridReference[this.players[player].position - 1] ||
-  //       this.gridReference[0]
-  //     );
-  //   }
-  //   return (
-  //     this.gridReference[this.players[this.currentPlayer].position - 1] ||
-  //     this.gridReference[0]
-  //   );
-  // }
-
   getDrawOffsetGridReference(player) {
     const position = this.players[player].drawPos
       ? this.players[player].drawPos - 1
@@ -389,7 +387,7 @@ class SnakesAndLadders {
     if (isSnakePortal) {
       this.players[this.currentPlayer].position +=
         this.gameBoard.snakes[this.players[this.currentPlayer].position];
-      this.setTurnMessages(this.messages.snake(), true);
+      this.setmessages(this.messageOptions.snake(), true);
       return true;
     }
     const isLadderPortal =
@@ -397,7 +395,7 @@ class SnakesAndLadders {
     if (isLadderPortal) {
       this.players[this.currentPlayer].position +=
         this.gameBoard.ladders[this.players[this.currentPlayer].position];
-      this.setTurnMessages(this.messages.ladder(), true);
+      this.setmessages(this.messageOptions.ladder(), true);
       return true;
     }
     return false;
@@ -414,19 +412,18 @@ class SnakesAndLadders {
 
   async play() {
     if (this.victory) {
-      this.setTurnMessages(this.messages.gameOver());
-      return this.turnMessages;
+      this.setmessages(this.messageOptions.gameOver());
+      return this.messages;
     }
     if (!this.readyForNextTurn) {
       return [];
     }
     this.turnTotal += 1;
     this.readyForNextTurn = false;
-    this.turnMessages = [];
     this.turnDice = this.rollDice();
     this.diceTotal = this.rollTotal();
     this.setPlayerPosition();
-    this.setTurnMessages(this.messages.move(), true);
+    this.setmessages(this.messageOptions.move(), true);
     this.animate();
     await this.animationcomplete();
     const isPortal = this.checkPortal();
@@ -437,26 +434,27 @@ class SnakesAndLadders {
 
     this.victory = this.isWon();
     if (this.victory) {
-      this.setTurnMessages(this.messages.victory());
-      return this.turnMessages;
+      this.setmessages(this.messageOptions.victory());
+      return this.messages;
     }
 
     if (this.isDoubles()) {
       this.samePlayerTurn();
       this.readyForNextTurn = true;
-      return this.turnMessages;
+      return this.messages;
     }
     this.setCurrentPlayer();
     this.readyForNextTurn = true;
-    return this.turnMessages;
+    return this.messages;
   }
 
   init() {
-    this.setContainerEl();
+    this.setboardEl();
     this.setBoardSize();
+    this.setMessageElHeight();
     this.setTokenRadius();
-    this.gameBoard = new GameBoard(this.containerEl, this.boardSize);
-    this.tokenBoard = new TokenBoard(this.containerEl, this.boardSize);
+    this.gameBoard = new GameBoard(this.boardEl, this.boardSize);
+    this.tokenBoard = new TokenBoard(this.boardEl, this.boardSize);
     this.gridReference = this.gameBoard.gridReference;
     this.animate();
   }
