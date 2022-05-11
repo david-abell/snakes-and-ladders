@@ -2,7 +2,7 @@
 
 "use-strict";
 
-import { getRandomDie, getSlope, getIntercept } from "./helpers.js";
+import { getRandomDie, getSlope, getIntercept, debounce } from "./helpers.js";
 import GameBoard from "./GameBoard.js";
 import PlayerToken from "./PlayerToken.js";
 import TokenBoard from "./TokenBoard.js";
@@ -68,34 +68,51 @@ class SnakesAndLadders {
 
   readyForNextTurn = true;
 
-  constructor(containerEl, messagesEl, size = 800) {
+  constructor(boardEl, messagesEl, size = 800) {
     this.requestedSize = size;
-    this.containerEl = containerEl;
+    this.boardEl = boardEl;
     this.messagesEl = messagesEl;
     this.messages = new Messages(messagesEl);
+    window.addEventListener("resize", debounce(this.init.bind(this), 50));
     this.init();
   }
 
   setBoardSize() {
-    const isInputInteger = Number.isInteger(this.requestedSize);
-    const minSize = isInputInteger ? Math.max(this.requestedSize, 250) : 250;
-    const maxSize = Math.floor(
-      Math.min(window.innerHeight, window.innerWidth) * 0.8
+    const shortestWindowLength = Math.floor(
+      Math.min(window.innerHeight * 0.78, window.innerWidth * 0.78)
     );
-    const result = minSize > maxSize ? maxSize : minSize;
-    this.boardSize = result;
+    const maxLargeLayoutCanvasSize =
+      Math.floor(Math.min(this.requestedSize, shortestWindowLength)) ||
+      shortestWindowLength;
+    const parentWidth = Math.floor(this.boardEl.parentElement.offsetWidth);
+    const isNarrowScreen = window.innerWidth < 1200;
+    if (!isNarrowScreen) {
+      this.boardSize =
+        parentWidth > maxLargeLayoutCanvasSize
+          ? maxLargeLayoutCanvasSize
+          : parentWidth - 320;
+    }
+    if (isNarrowScreen) {
+      this.boardSize = parentWidth;
+    }
   }
 
   setTokenRadius() {
     this.tokenRadius = Math.floor(this.boardSize / 45);
   }
 
-  setContainerEl() {
-    if (!this.containerEl) {
-      const newDiv = document.createElement("div");
-      newDiv.setAttribute("id", "board-container");
-      newDiv.classList.add("board-container");
-      this.containerEl = newDiv;
+  setboardEl() {
+    if (document.getElementById("board-container") || this.boardEl) {
+      return;
+    }
+    const gridContainer = document.getElementById("grid-container");
+    const newDiv = document.createElement("div");
+    newDiv.setAttribute("id", "board-container");
+    newDiv.classList.add("board-container");
+    this.boardEl = newDiv;
+    if (gridContainer) {
+      gridContainer.appendChild(newDiv);
+    } else {
       document.body.appendChild(newDiv);
     }
   }
@@ -113,7 +130,6 @@ class SnakesAndLadders {
       playerColor,
     };
     this.messages.add(result);
-    // this.messages.push(result);
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -433,12 +449,12 @@ class SnakesAndLadders {
   }
 
   init() {
-    this.setContainerEl();
+    this.setboardEl();
     this.setBoardSize();
     this.setMessageElHeight();
     this.setTokenRadius();
-    this.gameBoard = new GameBoard(this.containerEl, this.boardSize);
-    this.tokenBoard = new TokenBoard(this.containerEl, this.boardSize);
+    this.gameBoard = new GameBoard(this.boardEl, this.boardSize);
+    this.tokenBoard = new TokenBoard(this.boardEl, this.boardSize);
     this.gridReference = this.gameBoard.gridReference;
     this.animate();
   }

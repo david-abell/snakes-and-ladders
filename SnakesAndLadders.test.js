@@ -3,12 +3,24 @@ import SnakesAndLadders from "./SnakesAndLadders.js";
 
 let boardContainer;
 let messageContainer;
+let gridContainer;
 
 describe("Player should", () => {
   beforeEach(() => {
-    document.body.innerHTML = `<div id="board-container"></div><div id="message-container"><ol role="list" id="messages" class="messages"><li><b>Click play to start a new game</b></li></ol></div>`;
+    window.HTMLElement.prototype.scrollIntoView = jest.fn();
+    document.body.innerHTML = `
+    <div id="grid-container">
+    <div id="board-container"></div>
+    <div id="message-container">
+      <ol role="list" id="messages" class="messages">
+        <li><b>Click play to start a new game</b></li>
+      </ol>
+    </div>
+    </div>`;
     boardContainer = document.getElementById("board-container");
     messageContainer = document.getElementById("message-container");
+    gridContainer = document.getElementById("grid-container");
+    gridContainer.offsetWidth = 1600;
   });
   test("get another turn when doubles are rolled", async () => {
     const game = new SnakesAndLadders(boardContainer, messageContainer);
@@ -38,15 +50,20 @@ describe("Player should", () => {
 
 describe("rollDice method", () => {
   beforeEach(() => {
+    window.HTMLElement.prototype.scrollIntoView = jest.fn();
     document.body.innerHTML = `
+    <div id="grid-container">
     <div id="board-container"></div>
     <div id="message-container">
       <ol role="list" id="messages" class="messages">
         <li><b>Click play to start a new game</b></li>
       </ol>
+    </div>
     </div>`;
     boardContainer = document.getElementById("board-container");
     messageContainer = document.getElementById("message-container");
+    gridContainer = document.getElementById("grid-container");
+    gridContainer.offsetWidth = 1600;
   });
 
   test("should return two dice with number values", () => {
@@ -72,15 +89,20 @@ describe("rollDice method", () => {
 
 describe("messages", () => {
   beforeEach(() => {
+    window.HTMLElement.prototype.scrollIntoView = jest.fn();
     document.body.innerHTML = `
+    <div id="grid-container">
     <div id="board-container"></div>
     <div id="message-container">
       <ol role="list" id="messages" class="messages">
         <li><b>Click play to start a new game</b></li>
       </ol>
+    </div>
     </div>`;
     boardContainer = document.getElementById("board-container");
     messageContainer = document.getElementById("message-container");
+    gridContainer = document.getElementById("grid-container");
+    gridContainer.offsetWidth = 1600;
   });
 
   test("should be a message instance", () => {
@@ -116,15 +138,20 @@ describe("Init", () => {
   global.innerWidth = 1920;
   global.innerHeight = 1080;
   beforeEach(() => {
+    window.HTMLElement.prototype.scrollIntoView = jest.fn();
     document.body.innerHTML = `
+    <div id="grid-container">
     <div id="board-container"></div>
     <div id="message-container">
       <ol role="list" id="messages" class="messages">
         <li><b>Click play to start a new game</b></li>
       </ol>
+    </div>
     </div>`;
     boardContainer = document.getElementById("board-container");
     messageContainer = document.getElementById("message-container");
+    gridContainer = document.getElementById("grid-container");
+    gridContainer.offsetWidth = 1600;
   });
 
   test("should create game container", () => {
