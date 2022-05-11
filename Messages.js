@@ -20,7 +20,7 @@ class Messages {
 
   update() {
     this.messageEl.replaceChildren(...this.messageList);
-    this.messageEl.scrollTop = this.messageEl.scrollHeight;
+    this.messageEl.lastChild.scrollIntoView();
   }
 
   add(obj) {
