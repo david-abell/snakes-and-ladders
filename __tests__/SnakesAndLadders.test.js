@@ -1,5 +1,5 @@
-import Messages from "./Messages.js";
-import SnakesAndLadders from "./SnakesAndLadders.js";
+import Messages from "../src/Messages.js";
+import SnakesAndLadders from "../src/SnakesAndLadders.js";
 
 let boardContainer;
 let messageContainer;

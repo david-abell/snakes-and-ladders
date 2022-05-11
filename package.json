@@ -2,7 +2,7 @@
   "name": "snakes-and-ladders",
   "version": "1.0.0",
   "description": "",
-  "default": "game.js",
+  "default": "./src/index.js",
   "scripts": {
     "test": "jest",
     "testupdate": "jest --updateSnapshot"

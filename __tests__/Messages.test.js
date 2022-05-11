@@ -1,4 +1,4 @@
-import Messages from "./Messages.js";
+import Messages from "../src/Messages.js";
 
 let messageContainer;
 
