@@ -1,4 +1,4 @@
-import TokenBoard from "../src/TokenBoard.js";
+import TokenBoard from "../js/TokenBoard.js";
 
 describe("drawGrid", () => {
   test("", () => {});

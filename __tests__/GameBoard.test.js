@@ -1,4 +1,4 @@
-import GameBoard from "../src/GameBoard.js";
+import GameBoard from "../js/GameBoard.js";
 
 describe("drawGrid", () => {
   test("", () => {});
