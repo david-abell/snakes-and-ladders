@@ -96,22 +96,170 @@ class GameBoard {
     for (let i = 0; i < 100; i += 1) {
       const isEvenRow = Math.floor(i / 10) % 2 === 0;
       const yOffset = Math.floor(i / 10) * gridCount;
-      let squareXStart = gridCount / 2 + gridCount * i - yOffset * 10;
+      let squareXStart = Math.round(
+        gridCount / 2 + gridCount * i - yOffset * 10
+      );
       if (!isEvenRow) {
-        squareXStart = width - (gridCount / 2 + gridCount * i - yOffset * 10);
+        squareXStart = Math.round(
+          width - (gridCount / 2 + gridCount * i - yOffset * 10)
+        );
       }
 
-      const squareYStart = height - (gridCount / 2 + yOffset);
+      const squareYStart = Math.round(height - (gridCount / 2 + yOffset));
 
       this.context.fillText(`${i + 1}`, squareXStart, squareYStart);
       this.gridReference.push([squareXStart, squareYStart]);
     }
   }
 
+  drawPortals() {
+    // eslint-disable-next-line no-restricted-syntax
+    for (const key of Object.keys(this.ladders)) {
+      this.drawLadder(Number(key));
+    }
+    // eslint-disable-next-line no-restricted-syntax
+    for (const key of Object.keys(this.snakes)) {
+      this.drawSnake(Number(key));
+    }
+  }
+
+  drawLine(x1, y1, x2, y2, style) {
+    Object.assign(this.context, style);
+    this.context.beginPath();
+    this.context.moveTo(x1, y1);
+    this.context.lineTo(x2, y2);
+    this.context.stroke();
+  }
+
+  drawRungs(ladder) {
+    const style = { ...ladder.style };
+    const rungLength = 40;
+    const step = rungLength * 0.5;
+    const xOffset = step * ladder.tan();
+    const startX = ladder.from.x - 20 + xOffset;
+    let nextX = startX;
+    for (
+      let yi = ladder.from.y - step;
+      yi > ladder.to.y + 0.2 * step;
+      yi -= step
+    ) {
+      this.drawLine(nextX, yi, nextX + rungLength, yi, style);
+      nextX += xOffset;
+    }
+  }
+
+  drawLadder(position) {
+    if (!this.ladders[position]) {
+      return;
+    }
+    const toPosition = position + this.ladders[position];
+
+    // from Mathias Bynens' comment @ https://www.paulirish.com/2009/random-hex-color-code-snippets/
+    const randomColor = `#${Math.floor(Math.random() * 16777216).toString(16)}`;
+
+    const ladder = {
+      from: {
+        x: this.gridReference[position - 1][0],
+        y: this.gridReference[position - 1][1],
+      },
+      to: {
+        x: this.gridReference[toPosition - 1][0],
+        y: this.gridReference[toPosition - 1][1],
+      },
+      height() {
+        return this.from.y - this.to.y;
+      },
+      width() {
+        return this.to.x - this.from.x;
+      },
+      tan() {
+        return this.width() / this.height();
+      },
+      style: { strokeStyle: randomColor, lineWidth: 4 },
+    };
+    const lineGap = 20;
+    this.drawLine(
+      ladder.from.x - lineGap,
+      ladder.from.y,
+      ladder.to.x - lineGap,
+      ladder.to.y,
+      ladder.style
+    );
+
+    this.drawLine(
+      ladder.from.x + lineGap,
+      ladder.from.y,
+      ladder.to.x + lineGap,
+      ladder.to.y,
+      ladder.style
+    );
+
+    this.drawRungs(ladder);
+  }
+
+  drawSnake(position) {
+    if (!this.snakes[position]) {
+      return;
+    }
+    const toPosition = position + this.snakes[position];
+    // from Mathias Bynens' comment @ https://www.paulirish.com/2009/random-hex-color-code-snippets/
+    const randomColor = `#${Math.floor(Math.random() * 16777216).toString(16)}`;
+    const snake = {
+      from: {
+        x: this.gridReference[position - 1][0],
+        y: this.gridReference[position - 1][1],
+      },
+      to: {
+        x: this.gridReference[toPosition - 1][0],
+        y: this.gridReference[toPosition - 1][1],
+      },
+      height() {
+        return this.from.y - this.to.y;
+      },
+      width() {
+        return this.to.x - this.from.x;
+      },
+      tan() {
+        return this.width() / this.height();
+      },
+      style: {
+        strokeStyle: randomColor,
+        fillStyle: randomColor,
+        lineWidth: 12,
+      },
+    };
+    Object.assign(this.context, snake.style);
+
+    let { x } = snake.from;
+    let { y } = snake.from;
+    // let start = true;
+    const amplitude = 30;
+    const frequency = 20;
+    this.context.beginPath();
+    while (y < snake.to.y) {
+      x =
+        snake.from.x +
+        amplitude * Math.sin(y / frequency) +
+        snake.tan() * snake.from.y -
+        snake.tan() * y;
+      // if (start) {
+      //   start = false;
+      //   const head = new Path2D();
+      //   head.ellipse(x + 5, y - 12, 12, 22, Math.PI, 0, 2 * Math.PI);
+      //   this.context.fill(head);
+      // }
+
+      this.context.lineTo(x, y);
+      y += 1;
+    }
+    this.context.stroke();
+  }
+
   init() {
     this.setCanvas();
     this.drawGridLines();
     this.drawLettersAndSaveCoordinates();
+    this.drawPortals();
   }
 }
 

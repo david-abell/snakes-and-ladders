@@ -98,7 +98,7 @@ class SnakesAndLadders {
   }
 
   setTokenRadius() {
-    this.tokenRadius = Math.floor(this.boardSize / 45);
+    this.tokenRadius = Math.floor(this.boardSize / 55);
   }
 
   setboardEl() {
