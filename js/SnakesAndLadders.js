@@ -46,7 +46,9 @@ class SnakesAndLadders {
     samePlayerTurn: () =>
       `Player ${this.currentPlayer} rolled doubles and gets to roll again`,
     move: () =>
-      `Player ${this.currentPlayer} is on square ${
+      `Player ${this.currentPlayer} rolled a ${this.turnDice.die1} and a ${
+        this.turnDice.die2
+      } and moves ${this.diceTotal} spaces to square ${
         this.players[this.currentPlayer].position
       }`,
     ladder: () =>
