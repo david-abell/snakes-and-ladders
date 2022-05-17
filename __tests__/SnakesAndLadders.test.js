@@ -48,7 +48,7 @@ describe("Player should", () => {
   });
 });
 
-describe("rollDice method", () => {
+describe("rollDice", () => {
   beforeEach(() => {
     window.HTMLElement.prototype.scrollIntoView = jest.fn();
     document.body.innerHTML = `
@@ -115,10 +115,10 @@ describe("messages", () => {
     jest.spyOn(game, "rollDice").mockReturnValueOnce({ die1: 1, die2: 5 });
     await game.play();
     expect(document.querySelector("li:last-child").innerHTML).toMatch(
-      /Player 1 is on square 6/
+      /Player 1 rolled a 1 and a 5 and moves 6 spaces to square 6/
     );
     expect(document.querySelector("li:last-child").innerHTML).not.toMatch(
-      /Player 2 is on square 6/
+      /Player 2 rolled a 1 and a 5 and moves 6 spaces to square 6/
     );
   });
 
@@ -165,15 +165,15 @@ describe("Init", () => {
 
   test("too large", () => {
     const game = new SnakesAndLadders(boardContainer, messageContainer, 1200);
-    expect(game.boardSize).toBe(1000);
+    expect(game.boardSize).toBe(842);
   });
   test("too small", () => {
     const game = new SnakesAndLadders(boardContainer, messageContainer, 20);
-    expect(game.boardSize).toBe(250);
+    expect(game.boardSize).toBe(340);
   });
   test("decimal", () => {
     const game = new SnakesAndLadders(boardContainer, messageContainer, 0.8);
-    expect(game.boardSize).toBe(250);
+    expect(game.boardSize).toBe(340);
   });
   test("400px", () => {
     const game = new SnakesAndLadders(
@@ -181,9 +181,9 @@ describe("Init", () => {
       messageContainer,
       "400px"
     );
-    expect(game.boardSize).toBe(250);
+    expect(game.boardSize).toBe(842);
   });
-  test("0", () => {
+  test("no requested size", () => {
     const game = new SnakesAndLadders(boardContainer, messageContainer);
     expect(game.boardSize).toBe(800);
   });
