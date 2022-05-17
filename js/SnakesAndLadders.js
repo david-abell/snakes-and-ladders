@@ -19,6 +19,8 @@ class SnakesAndLadders {
 
   victory = false;
 
+  almostWon = false;
+
   turnTotal = 0;
 
   currentPlayer = 1;
@@ -46,7 +48,15 @@ class SnakesAndLadders {
     samePlayerTurn: () =>
       `Player ${this.currentPlayer} rolled doubles and gets to roll again`,
     move: () =>
-      `Player ${this.currentPlayer} is on square ${
+      `Player ${this.currentPlayer} rolled a ${this.turnDice.die1} and a ${
+        this.turnDice.die2
+      } and moves ${this.diceTotal} spaces to square ${
+        this.players[this.currentPlayer].position
+      }`,
+    almostWon: () =>
+      `Player ${this.currentPlayer} rolled too much with a ${
+        this.turnDice.die1
+      } and a ${this.turnDice.die2} and bounces off square 100  to square ${
         this.players[this.currentPlayer].position
       }`,
     ladder: () =>
@@ -78,6 +88,9 @@ class SnakesAndLadders {
   }
 
   setBoardSize() {
+    if (this.requestedSize < 340) {
+      this.requestedSize = 340;
+    }
     const shortestWindowLength = Math.floor(
       Math.min(window.innerHeight * 0.78, window.innerWidth * 0.78)
     );
@@ -338,7 +351,9 @@ class SnakesAndLadders {
   setPlayerPosition() {
     const playerPosition =
       this.players[this.currentPlayer].position + this.diceTotal;
-
+    if (playerPosition > 100) {
+      this.almostWon = true;
+    }
     const bouncedPosition =
       playerPosition > 100 ? 100 - (playerPosition - 100) : playerPosition;
 
@@ -410,6 +425,17 @@ class SnakesAndLadders {
     return new Promise(poll);
   }
 
+  turnCleanup() {
+    this.readyForNextTurn = true;
+    // this.almostWon = false;
+  }
+
+  setNewTurnVariables() {
+    this.readyForNextTurn = false;
+    this.almostWon = false;
+    this.turnTotal += 1;
+  }
+
   async play() {
     if (this.victory) {
       this.setmessages(this.messageOptions.gameOver());
@@ -418,12 +444,17 @@ class SnakesAndLadders {
     if (!this.readyForNextTurn) {
       return [];
     }
-    this.turnTotal += 1;
-    this.readyForNextTurn = false;
+    this.setNewTurnVariables();
+    // this.turnTotal += 1;
+    // this.readyForNextTurn = false;
     this.turnDice = this.rollDice();
     this.diceTotal = this.rollTotal();
     this.setPlayerPosition();
-    this.setmessages(this.messageOptions.move(), true);
+    if (this.almostWon) {
+      this.setmessages(this.messageOptions.almostWon(), true);
+    } else {
+      this.setmessages(this.messageOptions.move(), true);
+    }
     this.animate();
     await this.animationcomplete();
     const isPortal = this.checkPortal();
@@ -440,11 +471,11 @@ class SnakesAndLadders {
 
     if (this.isDoubles()) {
       this.samePlayerTurn();
-      this.readyForNextTurn = true;
+      this.turnCleanup();
       return this.messages;
     }
     this.setCurrentPlayer();
-    this.readyForNextTurn = true;
+    this.turnCleanup();
     return this.messages;
   }
 
