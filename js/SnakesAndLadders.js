@@ -88,6 +88,9 @@ class SnakesAndLadders {
   }
 
   setBoardSize() {
+    if (this.requestedSize < 340) {
+      this.requestedSize = 340;
+    }
     const shortestWindowLength = Math.floor(
       Math.min(window.innerHeight * 0.78, window.innerWidth * 0.78)
     );
