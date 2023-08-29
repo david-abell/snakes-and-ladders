@@ -476,6 +476,9 @@ class SnakesAndLadders {
     }
     this.setCurrentPlayer();
     this.turnCleanup();
+    if (this.currentPlayer === 2) {
+      setTimeout(() => this.play(), 300);
+    }
     return this.messages;
   }
 
