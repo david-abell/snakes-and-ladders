@@ -1,4 +1,6 @@
-# Snakes and ladders game for two players
+# Snakes and ladders board game
+
+![snakes and ladders game board](snakes-and-ladders.webp)
 
 ## Try it out here!
 
